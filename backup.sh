@@ -1,28 +1,33 @@
 #!usr/bin/bash
 
-#gpg Descript
-/usr/bin/gpg --batch --no-tty --homedir /root/.gnupg --passphrase-file '/root/.config/backup/senha.txt' '/home/usr/.config/rclone/rclone.conf.gpg'
-
-sudo systemctl start Backup.service
-
-# Setting this, so the repo does not need to be given on the commandline:
-export BORG_REPO="/mnt/rclone/Onedrive/Backup/Borg"
-
-# See the section "Passphrase notes" for more infos.
-export BORG_PASSPHRASE='Senhasegura'
-
 #Vars
 
-LOGFILE_PATH="/var/log/Borg/backup-$(date +%Y-%m-%d_%H-%M).txt"
+DIRGPG="/root/.gnupg"		# Diretório onde é armazenada chaves e senhas.
+PASSFILE="/root/.config/backup/senha.txt"			# Arquivo de Senha para Criptografar e descriptografar arquivos com GPG.
+RCLONECONFIG_CRIPT="/home/usr/.config/rclone/rclone.conf.gpg"	# Arquivo criptografado rclone.conf.gpg
+RCLONECONFIG="/home/usr/.config/rclone/rclone.conf"		# Arquivo descriptografado 
+LOGFILE_PATH="/var/log/Borg/backup-$(date +%Y-%m-%d_%H-%M).txt"		# Arquivo de Log
+BACKUPDIR="/home/"
+
+# Configurando isso, para que o repositório não precise ser fornecido na linha de comando:
+export BORG_REPO="/mnt/rclone/Onedrive/Backup/Borg"
+
+# Configurando isso, para que a senha não seja fornecido na linha de comando 
+export BORG_PASSPHRASE='Senhasegura'
+
+#gpg Descript
+/usr/bin/gpg --batch --no-tty --homedir '$DIRGPG' --passphrase-file '$PASSFILE' '$RCLONECONFIG_CRIPT' $LOGFILE_PATH
+
+sudo systemctl start Backup.service
 
 # some helpers and error handling:
 info() { printf "\n%s %s\n\n" "$( date )" "$*" >&2; }
 trap 'echo $( date ) Backup interrupted >&2; exit 2' INT TERM
 
-info "Starting backup" 2>&1 | tee -a $LOGFILE_PATH
+info "Backup Iniciado" 2>&1 | tee -a $LOGFILE_PATH
 
-# Backup the most important directories into an archive named after
-# the machine this script is currently running on:
+# Faça backup dos diretórios mais importantes em um arquivo com o nome
+# a máquina em que este script está sendo executado
 
 #echo "$(date "+%m-%d-%Y %T") : Borg backup has started" 2>&1 | tee -a $LOGFILE_PATH
 borg create                         \
@@ -34,10 +39,10 @@ borg create                         \
     --show-rc                       \
     --compression lz4               \
     --exclude-caches                \
-    --exclude-from '/home/user/Documentos/excludes.txt'  \
+    --exclude-from '/patch/dir/excludes.txt'  \
                                     \
     ::'{hostname}-{now}'            \
-    /home/             \
+    '$BACKUPDIR'             \
     >> $LOGFILE_PATH 2>&1
 
 
@@ -45,10 +50,10 @@ backup_exit=$?
 
 info "Pruning repository"
 
-# Use the `prune` subcommand to maintain 7 daily, 4 weekly and 6 monthly
-# archives of THIS machine. The '{hostname}-' prefix is very important to
-# limit prune's operation to this machine's archives and not apply to
-# other machines' archives also:
+# Use o subcomando `prune` para manter 7 diárias, 4 semanais e 6 mensais
+# arquivos desta máquina. O prefixo '{hostname}-' é muito importante para
+# limita a operação do prune aos arquivos desta máquina e não se aplica a
+# arquivos de outras máquinas também:	
 
 borg prune                          \
     --list                          \
@@ -61,7 +66,7 @@ borg prune                          \
 
 prune_exit=$?
 
-# use highest exit code as global exit code
+# usa o código de saída mais alto como código de saída global
 global_exit=$(( backup_exit > prune_exit ? backup_exit : prune_exit ))
 
 if [ ${global_exit} -eq 0 ]; then
@@ -74,8 +79,12 @@ fi
 
 exit ${global_exit}
 
-#RBackup Terminado 
+# Backup Concluido 
 
 sudo systemctl stop Backup.service
 
-rm -rf /home/usr/.config/rclone/rclone.conf
+rm -rf '$RCLONECONFIG' 
+
+echo
+echo "DONE!"
+echo "Backup Concluido." $LOGFILE_PATH
