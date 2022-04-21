@@ -15,16 +15,25 @@ export BORG_REPO="/mnt/rclone/Onedrive/Backup/Borg"
 # Configurando isso, para que a senha não seja fornecido na linha de comando 
 export BORG_PASSPHRASE='Senhasegura'
 
-#gpg Descript
-/usr/bin/gpg --batch --no-tty --homedir '$DIRGPG' --passphrase-file '$PASSFILE' '$RCLONECONFIG_CRIPT' $LOGFILE_PATH
-
-sudo systemctl start Backup.service
-
 # some helpers and error handling:
 info() { printf "\n%s %s\n\n" "$( date )" "$*" >&2; }
 trap 'echo $( date ) Backup interrupted >&2; exit 2' INT TERM
 
+#
+# Verifica se o Script é executado pelo root
+#
+if [ "$(id -u)" != "0" ]
+then
+        errorecho "ERRO: Este script deve ser executado como root!"
+        exit 1
+fi
+
 info "Backup Iniciado" 2>&1 | tee -a $LOGFILE_PATH
+
+#gpg Descript
+/usr/bin/gpg --batch --no-tty --homedir '$DIRGPG' --passphrase-file '$PASSFILE' '$RCLONECONFIG_CRIPT' $LOGFILE_PATH
+
+sudo systemctl start Backup.service
 
 # Faça backup dos diretórios mais importantes em um arquivo com o nome
 # a máquina em que este script está sendo executado

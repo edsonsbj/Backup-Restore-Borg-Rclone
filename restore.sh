@@ -15,29 +15,31 @@ export BORG_REPO="/mnt/rclone/Onedrive/Backup/Borg"
 # Configurando isso, para que a senha não seja fornecido na linha de comando 
 export BORG_PASSPHRASE='Senhasegura'
 
-#gpg Descript
-
-/usr/bin/gpg --batch --no-tty --homedir '$DIRGPG' --passphrase-file '$PASSFILE' '$RCLONECONFIG_CRIPT' $LOGFILE_PATH
-
-# Função para mensagens de erro
-errorecho() { cat <<< "$@" 1>&2; } $LOGFILE_PATH
+# Alguns auxiliares e tratamento de erros:
+info() { printf "\n%s %s\n\n" "$( date )" "$*" >&2; }
+trap 'echo $( date ) Backup interrupted >&2; exit 2' INT TERM
 
 #
 # Verifica se o Script é executado pelo root
 #
 if [ "$(id -u)" != "0" ]
 then
-        errorecho "ERROR: This script has to be run as root!"
+        errorecho "ERRO: Este script deve ser executado como root!"
         exit 1
 fi
+
+info "Restauração Iniciada" 2>&1 | tee -a $LOGFILE_PATH
+
+# Função para mensagens de erro
+errorecho() { cat <<< "$@" 1>&2; } 
+
+#gpg Descript
+
+/usr/bin/gpg --batch --no-tty --homedir '$DIRGPG' --passphrase-file '$PASSFILE' '$RCLONECONFIG_CRIPT' $LOGFILE_PATH
 
 # Montar Remoto Rclone
 
 sudo systemctl start Backup.service
-
-# Alguns auxiliares e tratamento de erros:
-info() { printf "\n%s %s\n\n" "$( date )" "$*" >&2; }
-trap 'echo $( date ) Backup interrupted >&2; exit 2' INT TERM
 
 # Restaura os Arquivos 
 # 
