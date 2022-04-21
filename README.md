@@ -2,12 +2,6 @@
 
 Este é um script básico para realizar backups automáticos usando Borg Backup e rclone. Ele usa um serviço systemd para montar um remoto rclone em uma pasta especifica como `/mnt/`.
 
-**Configuração**
-
-* Certifique-se de que os pacotes `rclone`e estejam instalados e operacionais.`borg`
-* *Opcional* : Criptografe o arquivo `rclone.conf` `sudo gpg --batch --no-tty --homedir /root/.gnupg --passphrase-file '/root/.config/backup/gpg-pass.txt' -c /home/usr/.config/rclone/rclone.conf,`o mesmo sera descriptografado ao executar o script e ao finalizar o backup a unidade sera desmontada e o arquivo descriptografado sera removido.
-* Mova o`borg.service`para as pastas apropriadas para que o systemd possa executá-los. Provavelmente `/etc/systemd/system`, mas isso pode variar dependendo da sua distribuição.
-
 **Realizando Backup**
 
  1. Certifique-se de que os pacotes `rclone` e  `borg `estejam instalados. 
@@ -19,7 +13,7 @@ Este é um script básico para realizar backups automáticos usando Borg Backup 
  7. Mova o`Rclone.service`para as pastas apropriadas para que o systemd possa executá-los. Provavelmente `/etc/systemd/system`, mas isso pode variar dependendo da sua distribuição.
  8. Vá para a pasta onde colocou os scripts e os torne executáveis com o comando `sudo chmod a+x`.
  9. Execute o backup: `sudo /path/to/backup.sh`.
-10. Agende o backup no Cron: `00 01* * * sudo /path/to/backup.sh`
+10. Agende o backup no Cron: `00 00* * * sudo /path/to/backup.sh`
 
 **Restauração**
 
