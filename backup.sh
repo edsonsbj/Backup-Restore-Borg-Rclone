@@ -1,19 +1,19 @@
-#!/bin/bash
+#!usr/bin/bash
 
-#Vars
+# Variáveis
 
-DIRGPG='/root/.gnupg'		# Diretório onde é armazenada chaves e senhas.
-PASSFILE='/root/.config/backup/senha.txt'	# Arquivo de Senha para Criptografar e descriptografar arquivos com GPG.
-RCLONECONFIG_CRIPT='/home/edson/.config/rclone/rclone-backup.conf.gpg'	# Arquivo criptografado rclone.conf.gpg
-RCLONECONFIG="/home/edson/.config/rclone/rclone-backup.conf"		# Arquivo descriptografado 
-LOGFILE_PATH="/var/log/Borg/restore-$(date +%Y-%m-%d_%H-%M).txt"	# Arquivo de Log
-BACKUPDIR="/mnt/Nextcloud/data"
+DIRGPG='/path/to/.gnupg'					# Diretório onde é armazenada chaves e senhas.
+PASSFILE='/path/to/senha.txt'					# Arquivo contendo a senha GPG 
+RCLONECONFIG_CRIPT='/path/to/rclone.conf.gpg'			# Arquivo criptografado rclone.conf.gpg
+RCLONECONFIG='/path/to/rclone.conf'				# Arquivo descriptografado 
+LOGFILE_PATH='/path/to/backup-$(date +%Y-%m-%d_%H-%M).txt'	# Arquivo de Log
+BACKUPDIR='/path/to/folder'					# Diretório para Backup
 
 # Configurando isso, para que o repositório não precise ser fornecido na linha de comando:
-export BORG_REPO="/mnt/rclone/Onedrive/Backup/Borg/Nextcloud"
+export BORG_REPO="/path/to/folder/Repo"
 
 # Configurando isso, para que a senha não seja fornecido na linha de comando 
-export BORG_PASSPHRASE='d76omCmT7SD@m@9@'
+export BORG_PASSPHRASE='Senhasegura'
 
 # some helpers and error handling:
 info() { printf "\n%s %s\n\n" "$( date )" "$*" >&2; }
@@ -34,8 +34,7 @@ info "Backup Iniciado" 2>&1 | tee -a $LOGFILE_PATH
 
 /usr/bin/gpg --batch --no-tty --homedir $DIRGPG --passphrase-file $PASSFILE $RCLONECONFIG_CRIPT >> $LOGFILE_PATH 2>&1
 
-
-sudo systemctl start Multimidia2.service
+sudo systemctl start Backup.service
 
 # Faça backup dos diretórios mais importantes em um arquivo com o nome
 # a máquina em que este script está sendo executado
@@ -50,10 +49,10 @@ borg create                         \
     --show-rc                       \
     --compression lz4               \
     --exclude-caches                \
-    --exclude-from '/home/edson/Documentos/Scripts Borg/borg-rclone-backup/excludes.txt'  \
+    --exclude-from '/path/to/exclude-list'  \
                                     \
     ::'{hostname}-{now}'            \
-    $BACKUPDIR             \
+    '$BACKUPDIR'             \
     >> $LOGFILE_PATH 2>&1
 
 
@@ -92,7 +91,7 @@ exit ${global_exit}
 
 # Backup Concluido 
 
-sudo systemctl stop Multimidia2.service
+sudo systemctl stop Backup.service
 
 rm -rf '$RCLONECONFIG' 
 

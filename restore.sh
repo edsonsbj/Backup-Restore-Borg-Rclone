@@ -1,20 +1,20 @@
 #!/bin/bash
 
-#Vars
+# Variáveis
 
-DIRGPG='/root/.gnupg'		# Diretório onde é armazenada chaves e senhas.
-PASSFILE='/root/.config/backup/senha.txt'	# Arquivo de Senha para Criptografar e descriptografar arquivos com GPG.
-RCLONECONFIG_CRIPT='/home/edson/.config/rclone/rclone-backup.conf.gpg'	# Arquivo criptografado rclone.conf.gpg
-RCLONECONFIG="/home/edson/.config/rclone/rclone-backup.conf"		# Arquivo descriptografado 
-LOGFILE_PATH="/var/log/Borg/restore-$(date +%Y-%m-%d_%H-%M).txt"	# Arquivo de Log
-DATARESTORE=2022-04-16T21:40:05		# Data do backup a ser restaurado (borg list)
-RESTOREDIR="/mnt/Nextcloud/data/Lucao"		# Arquivo ou Diretório a ser Resrtaurado
+DIRGPG='/path/to/.gnupg'					# Diretório onde é armazenada chaves e senhas.
+PASSFILE='/path/to/senha.txt'					# Arquivo contendo a senha GPG 
+RCLONECONFIG_CRIPT='/path/to/rclone.conf.gpg'			# Arquivo criptografado rclone.conf.gpg
+RCLONECONFIG='/path/to/rclone.conf'				# Arquivo descriptografado 
+LOGFILE_PATH='/path/to/backup-$(date +%Y-%m-%d_%H-%M).txt'	# Arquivo de Log
+RESTOREDIR='/path/to/folder'					# Diretório a ser restaurado
+DATARESTORE=2022-04-16T21:40:05				# Data do backup a ser restaurado (borg list)
 
 # Configurando isso, para que o repositório não precise ser fornecido na linha de comando:
-export BORG_REPO="/mnt/rclone/Onedrive/Backup/Borg/Nextcloud"
+export BORG_REPO="/path/to/folder/Repo"
 
 # Configurando isso, para que a senha não seja fornecido na linha de comando 
-export BORG_PASSPHRASE='d76omCmT7SD@m@9@'
+export BORG_PASSPHRASE='Senhasegura'
 
 # Alguns auxiliares e tratamento de erros:
 info() { printf "\n%s %s\n\n" "$( date )" "$*" >&2; }
@@ -40,7 +40,7 @@ errorecho() { cat <<< "$@" 1>&2; }
 
 # Montar Remoto Rclone
 
-sudo systemctl start Multimidia2.service
+sudo systemctl start Backup.service
 
 # Restaura os Arquivos 
 # 
@@ -50,11 +50,10 @@ borg extract -v --list "$BORG_REPO::$(hostname)-$DATARESTORE" $RESTOREDIR >> $LO
 
 # Backup Terminado 
 
-sudo systemctl stop Multimidia2.service
+sudo systemctl stop Backup.service
 
 rm -rf $RCLONECONFIG >> $LOGFILE_PATH 2>&1 
 
 echo
 echo "DONE!"
-echo "Successfully restored." >> $LOGFILE_PATH 2>&1
-
+echo "$(date "+%m-%d-%Y %T") : Successfully restored." 2>&1 | tee -a $LOGFILE_PATH
