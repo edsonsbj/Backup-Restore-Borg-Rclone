@@ -18,7 +18,7 @@ Este é um script básico para realizar backups automáticos usando Borg Backup 
 **Restauração**
 
 1. Liste os arquivos Borg para recuperar o nome do arquivo que você deseja restaurar: `sudo borg list /path-to-your-repo.` 
-2. Copie a ultima data onde foi realizado o backup e execute o comando: `sudo sed -i 's/data-Antiga/Nova-data/'`, ou se preferir edite o script `/restore.sh` com editor de sua preferencia e altere a data na variáve `DATARESTORE`
+2. Copie a ultima data onde foi realizado o backup e execute o comando: `sudo sed -i 's/data-Antiga/Nova-data/'`, ou se preferir edite o script `/restore.sh` com editor de sua preferencia e altere a data na variávei `DATARESTORE`
 3. Agende a restauração no Cron: `00 01* * 6 sudo /path/to/restore.sh`
 
 Observe que suponho que você fará a restauração no mesmo dispositivo e queira efetuar a restauração completa de sua pasta principal sem a necessidade de inserir dados no terminal.
