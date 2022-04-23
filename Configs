@@ -1,0 +1,34 @@
+#!/bin/bash
+
+# Diretório onde é armazenada chaves e senhas.
+DIRGPG='/path/to/.gnupg'
+
+# Arquivo de Senha para Criptografar e descriptografar arquivos com GPG.		
+PASSFILE='/path/to/senha.txt'
+	
+# Arquivo criptografado rclone.conf.gpg
+RCLONECONFIG_CRIPT='/path/to/rclone.conf.gpg'
+
+# Arquivo descriptografado 	
+RCLONECONFIG='/path/to/rclone.conf'
+
+# Arquivo de Log		
+LOGFILE_PATH='/path/to/backup-$(date +%Y-%m-%d_%H-%M).txt'
+
+# Arquivos e pastas para backup  
+BACKUPDIR='/path/to/folder'
+
+# Incluir pastas e arquivos especificos ao backup 
+INCLUDE='/path/to/include-exclude-list'
+
+# Arquivo ou pasta a ser restaurado
+RESTOREDIR='/path/to/folder'
+
+# Configurando isso, para que o repositório não precise ser fornecido na linha de comando:
+export BORG_REPO="/path/to/folder/Repo"
+
+# Configurando isso, para que a senha não seja fornecido na linha de comando 
+export BORG_PASSPHRASE='Senhasegura'
+
+# Data do backup a ser restaurado (borg list)
+DATARESTORE=2022-04-16T21:40:05

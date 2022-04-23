@@ -1,20 +1,7 @@
 #!/bin/bash
 
-# Variáveis
-
-DIRGPG='/path/to/.gnupg'					# Diretório onde é armazenada chaves e senhas.
-PASSFILE='/path/to/senha.txt'					# Arquivo contendo a senha GPG 
-RCLONECONFIG_CRIPT='/path/to/rclone.conf.gpg'			# Arquivo criptografado rclone.conf.gpg
-RCLONECONFIG='/path/to/rclone.conf'				# Arquivo descriptografado 
-LOGFILE_PATH='/path/to/backup-$(date +%Y-%m-%d_%H-%M).txt'	# Arquivo de Log
-RESTOREDIR='/path/to/folder'					# Diretório a ser restaurado
-DATARESTORE=2022-04-16T21:40:05				# Data do backup a ser restaurado (borg list)
-
-# Configurando isso, para que o repositório não precise ser fornecido na linha de comando:
-export BORG_REPO="/path/to/folder/Repo"
-
-# Configurando isso, para que a senha não seja fornecido na linha de comando 
-export BORG_PASSPHRASE='Senhasegura'
+CONFIG="/path/to/Configs"
+. $CONFIG
 
 # Alguns auxiliares e tratamento de erros:
 info() { printf "\n%s %s\n\n" "$( date )" "$*" >&2; }
