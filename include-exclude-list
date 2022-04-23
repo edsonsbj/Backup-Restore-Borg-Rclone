@@ -1,2 +1,12 @@
-/path/to.cache
-/path/to/Downloads
++ /path/to.cache
++ /path/to/Downloads
+- /path/to/
+
+# Exemplo Supondo que você queira fazer o backup da raiz mais excluir alguns diretorios
+
+# + /home/usr/Documentos
+# + /home/usr/Imagens
+# + /var/snap/Plex
+# + /var/spool/cron/crontabs
+# - **
+
