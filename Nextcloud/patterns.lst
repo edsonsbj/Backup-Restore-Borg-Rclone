@@ -1,0 +1,17 @@
+P sh
+R /
+
+# DIRETÓRIO CONTENDO SUAS CONFIGURAÇÕES EXPORTADAS
++ /var/snap/nextcloud/common/backups
+
+# DIRETÓRIO CONTENDO SEUS CERTIFICADOS
++ /var/snap/nextcloud/current/certs
+
+# DIRETÓRIO DE DADOS
++ /path/to/nextcloud/data
+
+# NÃO INCLUA A LIXEIRA 
+- /path/to/nextcloud/data/*/files_trashbin
+
+# Não Inclua mais nada
+- **

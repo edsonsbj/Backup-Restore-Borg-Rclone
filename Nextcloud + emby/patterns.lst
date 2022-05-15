@@ -1,0 +1,25 @@
+P sh
+R /
+
+# DIRETÓRIO CONTENDO SUAS CONFIGURAÇÕES EXPORTADAS
++ /var/snap/nextcloud/common/backups
+
+# DIRETÓRIO CONTENDO SEUS CERTIFICADOS
++ /var/snap/nextcloud/current/certs
+
+# DIRETÓRIOS PARA BACKUP EMBY MEDIA SERVER
++ /var/lib/emby/config
++ /var/lib/emby/data
++ /var/lib/emby/metadata
++ /var/lib/emby/plugins
++ /var/lib/emby/root
++ /var/lib/emby/ssl
+
+# DIRETÓRIO DE DADOS NEXTCLOUD
++ /path/to/nextcloud/data
+
+# NÃO INCLUA A LIXEIRA 
+- /path/to/nextcloud/data/*/files_trashbin
+
+# Não Inclua mais nada
+- **

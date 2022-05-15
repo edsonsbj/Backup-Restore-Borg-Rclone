@@ -1,0 +1,30 @@
+P sh
+R /
+
+# DIRETÓRIO CONTENDO SUAS CONFIGURAÇÕES EXPORTADAS
++ /var/snap/nextcloud/common/backups
+
+# DIRETÓRIO CONTENDO SEUS CERTIFICADOS
++ /var/snap/nextcloud/current/certs
+
+# DIRETÓRIOS PARA BACKUP PLEX MEDIA SERVER
++ /var/snap/plexmediaserver/common/Library/Application Support/Plex Media Server/Codecs
++ /var/snap/plexmediaserver/common/Library/Application Support/Plex Media Server/Crash Reports
++ /var/snap/plexmediaserver/common/Library/Application Support/Plex Media Server/Diagnostics
++ /var/snap/plexmediaserver/common/Library/Application Support/Plex Media Server/Logs
++ /var/snap/plexmediaserver/common/Library/Application Support/Plex Media Server/Media
++ /var/snap/plexmediaserver/common/Library/Application Support/Plex Media Server/Metadata
++ /var/snap/plexmediaserver/common/Library/Application Support/Plex Media Server/Plug-ins
++ /var/snap/plexmediaserver/common/Library/Application Support/Plex Media Server/Plug-in Support
++ /var/snap/plexmediaserver/common/Library/Application Support/Plex Media Server/Thumbnails
++ /var/snap/plexmediaserver/common/Library/Application Support/Plex Media Server/plexmediaserver.pid
++ /var/snap/plexmediaserver/common/Library/Application Support/Plex Media Server/Preferences.xml
+
+# DIRETÓRIO DE DADOS NEXTCLOUD
++ /path/to/nextcloud/data
+
+# NÃO INCLUA A LIXEIRA 
+- /path/to/nextcloud/data/*/files_trashbin
+
+# Não Inclua mais nada
+- **
