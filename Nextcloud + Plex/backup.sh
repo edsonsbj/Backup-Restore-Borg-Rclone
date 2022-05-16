@@ -1,4 +1,4 @@
-#!usr/bin/bash
+#!/bin/bash
 
 CONFIG="/path/to/Configs"
 . $CONFIG
@@ -50,12 +50,9 @@ borg create                         \
     --compression lz4               \
     --exclude-caches                \
     --patterns-from $PATTERNS	    \
-    >> $LOGFILE_PATH 2>&1	    
+    >> $LOGFILE_PATH 2>&1	    \
+    ::'{hostname}-{now:%Y%m%d-%H%M}'            \  
     
-    ::'{hostname}-{now:%Y-%m-%d-%H:%M}'            \    
-    
-
-
 backup_exit=$?
 
 info "Pruning repository"
