@@ -1,6 +1,6 @@
 ## **Script de backup e restauração usando Borg Backup e rclone**
 
-Este Script realiza o Backup e a Restauração das configurações do `Nexcloud` instalados por meio de pacotes `snap`, assim como a pasta `/Nextcloud/data` juntamente com as configurações do servidor emby (jellyfin) usando `Borg Backup` combinado com montagens `rclone` através de um serviço `systemctl`.
+Este Script realiza o Backup e a Restauração das configurações do `Nexcloud` instalados por meio de pacotes `snap`, assim como a pasta `/Nextcloud/data` juntamente com as configurações do servidor `emby (jellyfin)` usando `Borg Backup` combinado com montagens `rclone` através de um serviço `systemctl`.
 
 **Realizando Backup**
 
