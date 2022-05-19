@@ -24,7 +24,7 @@ Este Script realiza o Backup e a Restauração das configurações do `Nexcloud`
 5. Execute o script `restore.sh` ou agende o mesmo no cron `00 00* * * sudo /path/to/restore.sh`
 6. Caso queira restaurar a pasta `./Nextcloud/data` em um HD Externo, altere as variáveis `DEVICE` e `MOUNTDIR` em seu arquivo `.conf`, e descomente as linhas de 23 a 42 em seu script `restore.sh` 
 
-### **Algumas Observações Importantes **
+### Algumas Observações Importantes 
 
 Observe que suponho que você fará a restauração no mesmo dispositivo e queira efetuar a restauração completa de sua pasta principal sem a necessidade de inserir informações no terminal.
 
