@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CONFIG="/path/to/Configs"
+CONFIG="/path/to/.conf"
 . $CONFIG
 
 # alguns ajudantes e tratamento de erros:
@@ -39,7 +39,6 @@ echo
 # Faça backup dos diretórios mais importantes em um arquivo com o nome
 # a máquina em que este script está sendo executado
 
-#echo "$(date "+%m-%d-%Y %T") : Borg backup has started" 2>&1 | tee -a $LOGFILE_PATH
 borg create                         \
     --verbose                       \
     --filter AME                    \
@@ -51,8 +50,8 @@ borg create                         \
     --exclude-caches                \
     --patterns-from $PATTERNS	    \
     >> $LOGFILE_PATH 2>&1	    \
-    ::'{hostname}-{now:%Y%m%d-%H%M}'            \  
-    
+    ::'{hostname}-{now:%Y%m%d-%H%M}'            \
+ 
 backup_exit=$?
 
 info "Pruning repository"
@@ -79,14 +78,12 @@ echo
 sudo nextcloud.occ maintenance:mode --off >> $LOGFILE_PATH
 echo
 
-# Backup Concluido 
-
 # Desmonte o Rclone
 
 sudo systemctl stop Backup.service
 
 # Por Seguranção remova o rclone.conf 
-rm -rf '$RCLONECONFIG' 
+rm -rf $RCLONECONFIG 
 
 # usa o código de saída mais alto como código de saída global
 global_exit=$(( backup_exit > prune_exit ? backup_exit : prune_exit ))

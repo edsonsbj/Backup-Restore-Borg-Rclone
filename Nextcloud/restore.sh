@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CONFIG="/path/to/Configs"
+CONFIG="/path/to/.conf"
 . $CONFIG
 
 # Alguns auxiliares e tratamento de erros:

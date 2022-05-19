@@ -1,11 +1,11 @@
-#!usr/bin/bash
+#!/bin/bash
 
-CONFIG="/path/to/Configs"
+CONFIG="/path/to/.conf"
 . $CONFIG
 
-# some helpers and error handling:
+# alguns ajudantes e tratamento de erros:
 info() { printf "\n%s %s\n\n" "$( date )" "$*" >&2; }
-trap 'echo $( date ) Backup interrupted >&2; exit 2' INT TERM
+trap 'echo $( date ) Backup interrompido >&2; exit 2' INT TERM
 
 #
 # Verifica se o Script é executado pelo root
@@ -22,12 +22,13 @@ info "Backup Iniciado" 2>&1 | tee -a $LOGFILE_PATH
 
 /usr/bin/gpg --batch --no-tty --homedir $DIRGPG --passphrase-file $PASSFILE $RCLONECONFIG_CRIPT >> $LOGFILE_PATH 2>&1
 
+# Monte o Rclone
+
 sudo systemctl start Backup.service
 
 # Faça backup dos diretórios mais importantes em um arquivo com o nome
 # a máquina em que este script está sendo executado
 
-#echo "$(date "+%m-%d-%Y %T") : Borg backup has started" 2>&1 | tee -a $LOGFILE_PATH
 borg create                         \
     --verbose                       \
     --filter AME                    \
@@ -37,13 +38,10 @@ borg create                         \
     --show-rc                       \
     --compression lz4               \
     --exclude-caches                \
-    --patterns-from $INCLUDE 	    \
-                                    \
-    ::'{hostname}-{now}'            \
-    '$BACKUPDIR'  	            \
-    >> $LOGFILE_PATH 2>&1
-
-
+    --patterns-from $PATTERNS	    \
+    >> $LOGFILE_PATH 2>&1	    \
+    ::'{hostname}-{now:%Y%m%d-%H%M}'            \
+ 
 backup_exit=$?
 
 info "Pruning repository"
@@ -64,6 +62,13 @@ borg prune                          \
 
 prune_exit=$?
 
+# Desmonte o Rclone
+
+sudo systemctl stop Backup.service
+
+# Por Seguranção remova o rclone.conf 
+rm -rf $RCLONECONFIG 
+
 # usa o código de saída mais alto como código de saída global
 global_exit=$(( backup_exit > prune_exit ? backup_exit : prune_exit ))
 
@@ -76,12 +81,6 @@ else
 fi
 
 exit ${global_exit}
-
-# Backup Concluido 
-
-sudo systemctl stop Backup.service
-
-rm -rf '$RCLONECONFIG' 
 
 echo
 echo "DONE!"

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CONFIG="/path/to/Configs"
+CONFIG="/path/to/.conf"
 . $CONFIG
 
 # Alguns auxiliares e tratamento de erros:
@@ -104,8 +104,8 @@ sudo systemctl stop Backup.service
 
 # Por Segurança remova o rclone.conf
 
-rm -rf $RCLONECONFIG >> $RESTLOGFILE_PATH 2>&1 
+rm -rf $RCLONECONFIG
 
 echo
 echo "DONE!"
-echo "$(date "+%m-%d-%Y %T") : Successfully restored." 2>&1 | tee -a $RESTLOGFILE_PATH
+echo "$(date "+%m-%d-%Y %T") : Restauração Concluida com Sucesso." 2>&1 | tee -a $RESTLOGFILE_PATH
