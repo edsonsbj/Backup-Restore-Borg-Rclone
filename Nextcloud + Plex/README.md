@@ -1,28 +1,32 @@
-### **Script de backup e restauração usando Borg Backup e rclone**
+## **Script de backup e restauração usando Borg Backup e rclone**
 
-Este é um script básico para realizar backups automáticos usando Borg Backup e rclone. Ele usa um serviço systemd para montar um remoto rclone em uma pasta especifica como `/mnt/`.
+Este Script realiza o Backup e a Restauração das configurações do `Nexcloud` e do `Plexmediaserver` instalados por meio de pacotes `snap`, assim como a pasta `/Nextcloud/data` usando `Borg Backup` combinado com montagens `rclone` através de um serviço `systemctl`.
 
 **Realizando Backup**
 
  1. Certifique-se de que os pacotes `rclone` e  `borg `estejam instalados. 
  2. Crie e criptografe seu arquivo `rclone.conf` `sudo gpg --batch --no-tty --homedir /path/to/.gnupg --passphrase-file '/path/to/senha.txt' -c /path/to/rclone.conf.`
- 3. Defina o local do seu repositório na parte superior do script `export BORG_REPO=/path/to/folder/Repo.`
- 4. Defina as variáveis ​​para se adequar ao seu ambiente.
- 5. Altere as variáveis `AssertPathIsDirectory --config --cache-info-age=60m e ExecStop=/bin/fusermount -u` no arquivo `Backup.service`
- 6. Copie os 2 scripts para uma pasta de sua preferência. ou seja, scripts/backup.
- 7. Mova o`Backup.service`para as pastas apropriadas para que o systemd possa executá-los. Provavelmente `/etc/systemd/system`, mas isso pode variar dependendo da sua distribuição.
- 8. Vá para a pasta onde colocou os scripts e os torne executáveis com o comando `sudo chmod a+x`.
- 9. Execute o backup: `sudo /path/to/backup.sh`.
-10. Agende o backup no Cron: `00 00* * * sudo /path/to/backup.sh`
+ 3. Faça uma copia do arquivo `example.conf` e o renomeie.
+ 4. Defina as variáveis em seu arquivo `.conf`, para que corresponda as suas necessidades.
+ 5. Se Preferir mova os arquivos `backup.sh`, `patterns.lst`, `restore.sh` e o arquivo recem editado `.conf` para uma pasta de sua preferência.
+ 6. Torne os scripts executáveis `sudo chmod a+x`.
+ 8. Altere as variáveis `AssertPathIsDirectory --config --cache-info-age=60m e ExecStop=/bin/fusermount -u` no arquivo `Backup.service`.
+ 9. Mova o `Backup.service` para a pasta `/etc/systemd/system`.
+ 10. Execute o script `backup.sh`ou agende o mesmo no Cron `00 00* * * sudo /path/to/backup.sh` 
+
 
 **Restauração**
 
-1. Liste os arquivos Borg para recuperar o nome do arquivo que você deseja restaurar: `sudo borg list /path-to-your-repo.` 
-2. Copie a ultima data onde foi realizado o backup e execute o comando: `sudo sed -i 's/data-Antiga/Nova-data/'`, ou se preferir edite o script `/restore.sh` com editor de sua preferencia e altere a data na variávei `DATARESTORE`
-3. Agende a restauração no Cron: `00 01* * 6 sudo /path/to/restore.sh`
+1. Execute o comando `sudo borg list /path-to-your-repo.`
+2. Anote ou copie a data do backup que deseja restaurar 
+3. Informe a data na variável `DATARESTORE` em seu arquivo `.conf`
+4. Execute o script `restore.sh` ou agende o mesmo no cron `00 00* * * sudo /path/to/restore.sh`
+5. Caso queira restaurar a pasta `./Nextcloud/data` em um HD Externo, altere as variáveis `DEVICE` e `MOUNTDIR` em seu arquivo `.conf`.
 
-Observe que suponho que você fará a restauração no mesmo dispositivo e queira efetuar a restauração completa de sua pasta principal sem a necessidade de inserir dados no terminal.
+### **Algumas Observações Importantes **
 
-A Criptografia do arquivo  `rclone.conf`é opcional, se não for querer criptografar e só comentar as linhas referente a gpg tanto no arquivo `backup.sh e restore.sh.`
+Observe que suponho que você fará a restauração no mesmo dispositivo e queira efetuar a restauração completa de sua pasta principal sem a necessidade de inserir informações no terminal.
+
+A Criptografia do arquivo `rclone.conf` é opcional, caso não tenha interesse comente as linhas referente a gpg tanto no arquivo `backup.sh e restore.sh.`
 
 Em testes realizados o tempo de backup e restauração foram parecidos ou ate mesmo mais rápidos do que backups e restaurações realizados com os programas `duplicity ou deja-dup.`
