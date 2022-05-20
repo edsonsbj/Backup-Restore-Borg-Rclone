@@ -1,12 +1,6 @@
 P sh
 R /
 
-# DIRETÓRIO CONTENDO SUAS CONFIGURAÇÕES EXPORTADAS
-+ /var/snap/nextcloud/common/backups
-
-# DIRETÓRIO CONTENDO SEUS CERTIFICADOS
-+ /var/snap/nextcloud/current/certs
-
 # DIRETÓRIOS PARA BACKUP EMBY MEDIA SERVER
 + /var/lib/emby/config
 + /var/lib/emby/data
@@ -15,11 +9,17 @@ R /
 + /var/lib/emby/root
 + /var/lib/emby/ssl
 
-# DIRETÓRIO DE DADOS NEXTCLOUD
-+ /path/to/nextcloud/data
+# DIRETÓRIO CONTENDO SUAS CONFIGURAÇÕES EXPORTADAS
++ /var/snap/nextcloud/common/backups
 
-# NÃO INCLUA A LIXEIRA 
-- /path/to/nextcloud/data/*/files_trashbin
+# DIRETÓRIO CONTENDO SEUS CERTIFICADOS
++ /var/snap/nextcloud/current/certs
+
+# DIRETÓRIO DE DADOS. CASO TENHA MOVIDO SUA PASTA ./nextcloud/data PARA OUTRO LOCAL ALTERE O CAMINHO ABAIXO
++ /var/snap/nextcloud/common/nextcloud/data
+
+# NÃO INCLUA A LIXEIRA. CASO TENHA MOVIDO SUA PASTA ./nextcloud/data PARA OUTRO LOCAL ALTERE O CAMINHO ABAIXO
+- /var/snap/nextcloud/common/nextcloud/data/*/files_trashbin
 
 # Não Inclua mais nada
 - **
