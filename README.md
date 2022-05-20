@@ -63,3 +63,15 @@ Este conjunto reune scripts básicos para realizar backups automáticos usando B
 ### Testes
 
  - Em testes realizados o tempo decorrido do backup e restauração foram semelhantes ao de outras ferramentas como `duplicity ou deja-dup.`
+
+# **Nextcloud**
+
+- Utilize este script caso possua um servidor Nextcloud instalado por meio de Pacotes snap.
+
+# **Nextcloud + Emby**
+
+- Utilize este script caso possua um servidor Nextcloud e Plex na mesma maquina. Lembrando que a instalação do Nextcloud mencionada no script e por meio de pacotes snap.
+- 
+# **Nextcloud + Plex**
+
+- Utilize este script caso possua um servidor Nextcloud e emby na mesma maquina. Lembrando que a instalação do Nextcloud mencionada no script e por meio de pacotes snap.
