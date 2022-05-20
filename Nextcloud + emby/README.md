@@ -1,11 +1,14 @@
-# **Script de backup e restauração usando Borg Backup e rclone**
+# **Nextcloud + Emby**
 
 Este Script realiza o Backup e a Restauração das configurações do `Nexcloud` instalados por meio de pacotes `snap`, assim como a pasta `/Nextcloud/data` e as configurações do `emby (jellyfin)`, usando `Borg Backup` combinado com montagens `rclone` através de um serviço `systemctl`.
 
 ## **Realizando Backup**
 
  1. Certifique-se de que os pacotes `rclone` e  `borg `estejam instalados. 
- 2. Crie e criptografe seu arquivo `rclone.conf` `sudo gpg --batch --no-tty --homedir /path/to/.gnupg --passphrase-file '/path/to/senha.txt' -c /path/to/rclone.conf.`
+ 2. Opicionalmente crie e criptografe seu arquivo `rclone.conf` com o comando
+ ````
+ sudo gpg --batch --no-tty --homedir /path/to/.gnupg --passphrase-file '/path/to/senha.txt' -c /path/to/rclone.conf.
+ ````
  3. Faça uma copia do arquivo `example.conf` e o renomeie.
  4. Se preferir adicione as pastas para fazer backup no arquivo `patterns.lst`. Por Padrão o arquivo já esta pré-configurado para fazer backup das pastas `/var/snap/nextcloud/backups` `/var/snap/nextcloud/common/nextcloud/data` `/var/snap/nextcloud/current/certs` e excluir do backup a pasta `./files_trashbin`.
  5. Defina as variáveis em seu arquivo `.conf`, para que corresponda as suas necessidades.
@@ -13,8 +16,10 @@ Este Script realiza o Backup e a Restauração das configurações do `Nexcloud`
  7. Torne os scripts executáveis `sudo chmod a+x`.
  8. Altere as variáveis `AssertPathIsDirectory --config --cache-info-age=60m e ExecStop=/bin/fusermount -u` no arquivo `Backup.service`.
  9. Mova o `Backup.service` para a pasta `/etc/systemd/system`.
- 10. Execute o script `backup.sh`ou agende o mesmo no Cron `00 00* * * sudo /path/to/backup.sh` 
-
+ 10. Execute o script `backup.sh`ou agende o mesmo no Cron 
+ ````
+ 00 00 * * * sudo /path/to/backup.sh
+ ```` 
 ## **Restauração**
 
 **Restaure todo o Servidor**
@@ -23,7 +28,7 @@ Este Script realiza o Backup e a Restauração das configurações do `Nexcloud`
 2. Anote ou copie a data do backup que deseja restaurar 
 3. Informe a data na variável `DATARESTORE` em seu arquivo `.conf`
 4. Altere o caminho na variável `NEXTCLOUD_CONFIG` em seu arquivo `.conf` para que corresponda ao caminho exato onde o Nextcloud despejou as configurações exportadas. Geralmente `/var/snap/nextcloud/common/backups/20220430-200029`.
-5. Execute o script `restore.sh` ou agende o mesmo no cron `00 00* * * sudo /path/to/restore.sh`
+5. Execute o script `restore.sh` ou agende o mesmo no cron.
 6. Caso queira restaurar a pasta `./Nextcloud/data` em um HD Externo, altere as variáveis `DEVICE` e `MOUNTDIR` em seu arquivo `.conf`, e descomente as linhas a seguir no arquivo `restore.sh:` 
 ```
 # NÃO ALTERE
@@ -57,7 +62,7 @@ Este Script realiza o Backup e a Restauração das configurações do `Nexcloud`
 5. Edite o arquivo `patterns.lst` com editor de sua preferência e remova todos os caminhos referentes ao `./Nextcloud/data` e a pasta de midia do `emby`.
 6. Altere o caminho do arquivo `patterns.lst` em seu arquivo `.conf`
 7. Altere o caminho na variável `NEXTCLOUD_CONFIG` em seu arquivo `.conf` para que corresponda ao caminho exato onde o Nextcloud despejou as configurações exportadas. Geralmente `/var/snap/nextcloud/common/backups/20220430-200029`.
-8. Execute o script `restore.sh` ou agende o mesmo no cron `00 00* * * sudo /path/to/restore.sh`.
+8. Execute o script `restore.sh` ou agende o mesmo no cron.
 
 **Restaure os dados**
 
@@ -76,7 +81,7 @@ Este Script realiza o Backup e a Restauração das configurações do `Nexcloud`
    sudo adduser emby root
    sudo systemctl start emby-server.service
 ``` 
-8. Execute o script `restore.sh` ou agende o mesmo no cron `00 00* * * sudo /path/to/restore.sh`.
+8. Execute o script `restore.sh` ou agende o mesmo no cron`.
 9.  Caso queira restaurar a pasta `./Nextcloud/data` em um HD Externo, altere as variáveis `DEVICE` e `MOUNTDIR` em seu arquivo `.conf`, e descomente as linhas a seguir no arquivo `restore.sh:` 
 ```
 # NÃO ALTERE
