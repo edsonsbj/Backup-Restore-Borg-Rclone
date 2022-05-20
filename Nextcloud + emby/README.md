@@ -109,7 +109,11 @@ Este Script realiza o Backup e a Restauração das configurações do `Nexcloud`
 ### Algumas Observações Importantes 
 
    - A Criptografia do arquivo `rclone.conf` é opcional, caso não tenha interesse comente as linhas referente a gpg tanto no arquivo `backup.sh e restore.sh.`
-   
+ ````
+ #gpg Descript
+
+/usr/bin/gpg --batch --no-tty --homedir $DIRGPG --passphrase-file $PASSFILE $RCLONECONFIG_CRIPT >> $RESTLOGFILE_PATH 2>&1
+````
    - Para servidores `emby (jellyfin)` com a pasta de midia fora do `nextcloud`, favor adicionar o caminho completo no arquivo `patterns.lst.` 
 
    - Estes scripts realiza o backup e restauração das configurações do Nextcloud através dos comandos `nextcloud.export` e `nextcloud.import`. Caso prefira fazer o backup manual do `Nextcloud` adicione em seu arquivo `patterns.lst` os caminhos `/var/snap/nextcloud` `/snap/nextcloud` e comente as linhas referente a exportação importação nos scripts `backup.sh` `restore.sh`.
