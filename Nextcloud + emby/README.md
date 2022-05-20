@@ -24,8 +24,30 @@ Este Script realiza o Backup e a Restauração das configurações do `Nexcloud`
 3. Informe a data na variável `DATARESTORE` em seu arquivo `.conf`
 4. Altere o caminho na variável `NEXTCLOUD_CONFIG` em seu arquivo `.conf` para que corresponda ao caminho exato onde o Nextcloud despejou as configurações exportadas. Geralmente `/var/snap/nextcloud/common/backups/20220430-200029`.
 5. Execute o script `restore.sh` ou agende o mesmo no cron `00 00* * * sudo /path/to/restore.sh`
-6. Caso queira restaurar a pasta `./Nextcloud/data` em um HD Externo, altere as variáveis `DEVICE` e `MOUNTDIR` em seu arquivo `.conf`, e descomente o intervalo de linhas de 23 a 42 em seu script `restore.sh` 
+6. Caso queira restaurar a pasta `./Nextcloud/data` em um HD Externo, altere as variáveis `DEVICE` e `MOUNTDIR` em seu arquivo `.conf`, e descomente as linhas a seguir no arquivo `restore.sh:` 
+```
+# NÃO ALTERE
+# MOUNT_FILE="/proc/mounts"
+# NULL_DEVICE="1> /dev/null 2>&1"
+# REDIRECT_LOG_FILE="1>> $LOGFILE_PATH 2>&1"
 
+# O Dispositivo está Montado?
+# grep -q "$DEVICE" "$MOUNT_FILE"
+# if [ "$?" != "0" ]; then
+  # Se não, monte em $MOUNTDIR
+#  echo " Dispositivo não montado. Monte $DEVICE " >> $LOGFILE_PATH
+#  eval mount -t auto "$DEVICE" "$MOUNTDIR" "$NULL_DEVICE"
+#else
+#  # Se sim, grep o ponto de montagem e altere o $MOUNTDIR
+#  DESTINATIONDIR=$(grep "$DEVICE" "$MOUNT_FILE" | cut -d " " -f 2)
+#fi
+
+# Há permissões de excrita e gravação?
+# [ ! -w "$MOUNTDIR" ] && {
+#  echo " Não tem permissões de gravação " >> $LOGFILE_PATH
+#  exit 1
+# }
+```
 **Restaure somente as configurações**
 
 1. Execute o comando `sudo borg list /path-to-your-repo.`
@@ -46,22 +68,39 @@ Este Script realiza o Backup e a Restauração das configurações do `Nexcloud`
 5. Edite o arquivo `patterns.lst` com editor de sua preferência e remova todos os caminhos referentes as configurações deixando apenas os diretórios de dados como `./Nextcloud/data` e a pasta de midia do `emby`.
 6. Altere o caminho do arquivo `patterns.lst` em seu arquivo `.conf`
 7. Comente as linhas a seguir no `restore.sh` 
-
-   `sudo systemctl stop emby-server.service `
-   
-   `sudo nextcloud.import -abc $NEXTCLOUD_CONFIG/$date >> $RESTLOGFILE_PATH `
-   
-   `sudo chown -R emby:emby "/var/lib/emby/" `
-   
-   `sudo chmod –R 755 "/var/lib/emby/" `
-   
-   `sudo adduser emby root `
-   
-   `sudo systemctl start emby-server.service `
- 
+```
+   sudo systemctl stop emby-server.service
+   sudo nextcloud.import -abc $NEXTCLOUD_CONFIG/$date >> $RESTLOGFILE_PATH   
+   sudo chown -R emby:emby "/var/lib/emby/"
+   sudo chmod –R 755 "/var/lib/emby/"
+   sudo adduser emby root
+   sudo systemctl start emby-server.service
+``` 
 8. Execute o script `restore.sh` ou agende o mesmo no cron `00 00* * * sudo /path/to/restore.sh`.
-9.  Caso queira restaurar a pasta `./Nextcloud/data` em um HD Externo, altere as variáveis `DEVICE` e `MOUNTDIR` em seu arquivo `.conf`, e descomente o intervalo de linhas de 23 a 42 em seu script `restore.sh` 
+9.  Caso queira restaurar a pasta `./Nextcloud/data` em um HD Externo, altere as variáveis `DEVICE` e `MOUNTDIR` em seu arquivo `.conf`, e descomente as linhas a seguir no arquivo `restore.sh:` 
+```
+# NÃO ALTERE
+# MOUNT_FILE="/proc/mounts"
+# NULL_DEVICE="1> /dev/null 2>&1"
+# REDIRECT_LOG_FILE="1>> $LOGFILE_PATH 2>&1"
 
+# O Dispositivo está Montado?
+# grep -q "$DEVICE" "$MOUNT_FILE"
+# if [ "$?" != "0" ]; then
+  # Se não, monte em $MOUNTDIR
+#  echo " Dispositivo não montado. Monte $DEVICE " >> $LOGFILE_PATH
+#  eval mount -t auto "$DEVICE" "$MOUNTDIR" "$NULL_DEVICE"
+#else
+#  # Se sim, grep o ponto de montagem e altere o $MOUNTDIR
+#  DESTINATIONDIR=$(grep "$DEVICE" "$MOUNT_FILE" | cut -d " " -f 2)
+#fi
+
+# Há permissões de excrita e gravação?
+# [ ! -w "$MOUNTDIR" ] && {
+#  echo " Não tem permissões de gravação " >> $LOGFILE_PATH
+#  exit 1
+# }
+```
 ### Algumas Observações Importantes 
 
    - A Criptografia do arquivo `rclone.conf` é opcional, caso não tenha interesse comente as linhas referente a gpg tanto no arquivo `backup.sh e restore.sh.`
