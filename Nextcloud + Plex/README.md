@@ -80,6 +80,11 @@ Este Script realiza o Backup e a Restauração das configurações do `Nexcloud`
 ### Algumas Observações Importantes 
 
    - A Criptografia do arquivo `rclone.conf` é opcional, caso não tenha interesse comente as linhas referente a gpg tanto no arquivo `backup.sh e restore.sh.`
+  ```
+ #gpg Descript
+
+/usr/bin/gpg --batch --no-tty --homedir $DIRGPG --passphrase-file $PASSFILE $RCLONECONFIG_CRIPT >> $RESTLOGFILE_PATH 2>&1
+```
    
    - Para servidores `PLEX` com a pasta de midia fora do `nextcloud`, favor adicionar o caminho completo no arquivo `patterns.lst.` 
 
