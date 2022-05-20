@@ -7,11 +7,11 @@ R /
 # DIRETÓRIO CONTENDO SEUS CERTIFICADOS
 + /var/snap/nextcloud/current/certs
 
-# DIRETÓRIO DE DADOS
-+ /path/to/nextcloud/data
+# DIRETÓRIO DE DADOS. CASO TENHA MOVIDO SUA PASTA ./nextcloud/data PARA OUTRO LOCAL ALTERE O CAMINHO ABAIXO
++ /var/snap/nextcloud/common/nextcloud/data
 
-# NÃO INCLUA A LIXEIRA 
-- /path/to/nextcloud/data/*/files_trashbin
+# NÃO INCLUA A LIXEIRA. CASO TENHA MOVIDO SUA PASTA ./nextcloud/data PARA OUTRO LOCAL ALTERE O CAMINHO ABAIXO
+- /var/snap/nextcloud/common/nextcloud/data*/files_trashbin
 
 # Não Inclua mais nada
 - **
