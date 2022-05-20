@@ -9,14 +9,14 @@ Este Script realiza o Backup e a Restauração das configurações do `Nexcloud`
  ````
  sudo gpg --batch --no-tty --homedir /path/to/.gnupg --passphrase-file '/path/to/senha.txt' -c /path/to/rclone.conf.
  ````
- 4. Faça uma copia do arquivo `example.conf` e o renomeie.
- 5. Se preferir adicione as pastas para fazer backup no arquivo `patterns.lst`. Por Padrão o arquivo já esta pré-configurado para fazer backup das pastas `/var/snap/nextcloud/backups` `/var/snap/nextcloud/common/nextcloud/data` `/var/snap/nextcloud/current/certs` e excluir do backup a pasta `./files_trashbin`.
- 6. Defina as variáveis em seu arquivo `.conf`, para que corresponda as suas necessidades.
- 7. Se Preferir mova os arquivos `backup.sh`, `patterns.lst`, `restore.sh` e o arquivo recem editado `.conf` para uma pasta de sua preferência.
- 8. Torne os scripts executáveis `sudo chmod a+x`.
- 9. Altere as variáveis `AssertPathIsDirectory --config --cache-info-age=60m e ExecStop=/bin/fusermount -u` no arquivo `Backup.service`.
- 10. Mova o `Backup.service` para a pasta `/etc/systemd/system`.
- 11. Execute o script `backup.sh`ou agende o mesmo no Cron 
+ 3. Faça uma copia do arquivo `example.conf` e o renomeie.
+ 4. Se preferir adicione as pastas para fazer backup no arquivo `patterns.lst`. Por Padrão o arquivo já esta pré-configurado para fazer backup das pastas `/var/snap/nextcloud/backups` `/var/snap/nextcloud/common/nextcloud/data` `/var/snap/nextcloud/current/certs` e excluir do backup a pasta `./files_trashbin`.
+ 5. Defina as variáveis em seu arquivo `.conf`, para que corresponda as suas necessidades.
+ 6. Se Preferir mova os arquivos `backup.sh`, `patterns.lst`, `restore.sh` e o arquivo recem editado `.conf` para uma pasta de sua preferência.
+ 7. Torne os scripts executáveis `sudo chmod a+x`.
+ 8. Altere as variáveis `AssertPathIsDirectory --config --cache-info-age=60m e ExecStop=/bin/fusermount -u` no arquivo `Backup.service`.
+ 9. Mova o `Backup.service` para a pasta `/etc/systemd/system`.
+ 10. Execute o script `backup.sh`ou agende o mesmo no Cron 
  ````
  00 00 * * * sudo /path/to/backup.sh
  ```` 
@@ -105,7 +105,11 @@ Este Script realiza o Backup e a Restauração das configurações do `Nexcloud`
 ### Algumas Observações Importantes 
 
    - A Criptografia do arquivo `rclone.conf` é opcional, caso não tenha interesse comente as linhas referente a gpg tanto no arquivo `backup.sh e restore.sh.`
+ ```
+ #gpg Descript
 
+/usr/bin/gpg --batch --no-tty --homedir $DIRGPG --passphrase-file $PASSFILE $RCLONECONFIG_CRIPT >> $RESTLOGFILE_PATH 2>&1
+```
    - Estes scripts realiza o backup e restauração das configurações do Nextcloud através dos comandos `nextcloud.export` e `nextcloud.import`. Caso prefira fazer o backup manual do `Nextcloud` adicione em seu arquivo `patterns.lst` os caminhos `/var/snap/nextcloud` `/snap/nextcloud` e comente as linhas referente a exportação importação nos scripts `backup.sh` `restore.sh`.
 
 ### Testes
