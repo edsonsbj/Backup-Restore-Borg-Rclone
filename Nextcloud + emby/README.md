@@ -60,10 +60,13 @@ Este Script realiza o Backup e a Restauração das configurações do `Nexcloud`
    `sudo systemctl start emby-server.service `
  
 8. Execute o script `restore.sh` ou agende o mesmo no cron `00 00* * * sudo /path/to/restore.sh`.
+9.  Caso queira restaurar a pasta `./Nextcloud/data` em um HD Externo, altere as variáveis `DEVICE` e `MOUNTDIR` em seu arquivo `.conf`, e descomente o intervalo de linhas de 23 a 42 em seu script `restore.sh` 
 
 ### Algumas Observações Importantes 
 
    - A Criptografia do arquivo `rclone.conf` é opcional, caso não tenha interesse comente as linhas referente a gpg tanto no arquivo `backup.sh e restore.sh.`
+   
+   - Para servidores `emby (jellyfin)` com a pasta de midia fora do `nextcloud`, favor adicionar o caminho completo no arquivo `patterns.lst.` 
 
    - Estes scripts realiza o backup e restauração das configurações do Nextcloud através dos comandos `nextcloud.export` e `nextcloud.import`. Caso prefira fazer o backup manual do `Nextcloud` adicione em seu arquivo `patterns.lst` os caminhos `/var/snap/nextcloud` `/snap/nextcloud` e comente as linhas referente a exportação importação nos scripts `backup.sh` `restore.sh`.
 
