@@ -88,7 +88,7 @@ echo
 
 # Restaurando Configurações Nextcloud 
 
-sudo nextcloud.import -abc $NEXTCLOUD_CONFIG/$date >> $RESTLOGFILE_PATH
+sudo nextcloud.import -abc $NEXTCLOUD_CONFIG >> $RESTLOGFILE_PATH
 
 # Backup Terminado 
 
