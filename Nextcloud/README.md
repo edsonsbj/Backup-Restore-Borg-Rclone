@@ -27,11 +27,12 @@ Este Script realiza o Backup e a Restauração das configurações do `Nexcloud`
 
 1. Altere o caminho na variável `NEXTCLOUD_CONFIG` em seu arquivo `.conf` para que corresponda ao caminho exato onde o Nextcloud despejou as configurações exportadas. Geralmente `/var/snap/nextcloud/common/backups/20220430-200029`.
 2. Execute o script com a data desejada do backup a ser restaurado.
-   Exemplo
+
+    Exemplo
    ```
    ./restore.sh 2023-07-15
    ```
-3. Caso queira restaurar a pasta `./Nextcloud/data` em um HD Externo, altere as variáveis `DEVICE` e `MOUNTDIR` em seu arquivo `.conf`, e descomente as linhas a seguir no arquivo `restore.sh:` 
+4. Caso queira restaurar a pasta `./Nextcloud/data` em um HD Externo, altere as variáveis `DEVICE` e `MOUNTDIR` em seu arquivo `.conf`, e descomente as linhas a seguir no arquivo `restore.sh:` 
 ```
 # NÃO ALTERE
 # MOUNT_FILE="/proc/mounts"
@@ -62,6 +63,7 @@ Este Script realiza o Backup e a Restauração das configurações do `Nexcloud`
 3. Altere o caminho do arquivo `patterns.lst` em seu arquivo `.conf`
 4. Altere o caminho na variável `NEXTCLOUD_CONFIG` em seu arquivo `.conf` para que corresponda ao caminho exato onde o Nextcloud despejou as configurações exportadas. Geralmente `/var/snap/nextcloud/common/backups/20220430-200029`.
 5. Execute o script com a data desejada do backup a ser restaurado.
+
    Exemplo
    ```
    ./restore.sh 2023-07-15
@@ -77,7 +79,8 @@ Este Script realiza o Backup e a Restauração das configurações do `Nexcloud`
    sudo nextcloud.import -abc $NEXTCLOUD_CONFIG/$date >> $RESTLOGFILE_PATH   
 ``` 
 5. Execute o script com a data desejada do backup a ser restaurado.
-   Exemplo
+
+    Exemplo
    ```
    ./restore.sh 2023-07-15
    ```
