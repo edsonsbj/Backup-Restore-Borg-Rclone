@@ -11,13 +11,13 @@ Este Script realiza o Backup e a Restauração de sua instância Nextcloud insta
  sudo gpg --batch --no-tty --homedir /path/to/.gnupg --passphrase-file '/path/to/senha.txt' -c /path/to/rclone.conf.
  ````
  4. Faça uma copia do arquivo `example.conf` e o renomeie.
- 4. Se preferir adicione as pastas para fazer backup no arquivo `patterns.lst`. Por Padrão o arquivo já esta pré-configurado para fazer backup das pastas `/var/www/nextcloud` `/path/nextcloud/data` e excluir do backup a pasta `./files_trashbin`.
- 5. Defina as variáveis em seu arquivo `.conf`, para que corresponda as suas necessidades.
- 6. Se Preferir mova os arquivos `backup.sh`, `patterns.lst`, `restore.sh` e o arquivo recem editado `.conf` para uma pasta de sua preferência.
- 7. Torne os scripts executáveis `sudo chmod a+x`.
- 8. Altere as variáveis `AssertPathIsDirectory --config --cache-info-age=60m e ExecStop=/bin/fusermount -u` no arquivo `Backup.service`.
- 9. Mova o `Backup.service` para a pasta `/etc/systemd/system`.
- 10. Execute o script `backup.sh`ou agende o mesmo no Cron 
+ 5. Se preferir adicione as pastas para fazer backup no arquivo `patterns.lst`. Por Padrão o arquivo já esta pré-configurado para fazer backup das pastas `/var/www/nextcloud` `/path/nextcloud/data` e excluir do backup a pasta `./files_trashbin`.
+ 6. Defina as variáveis em seu arquivo `.conf`, para que corresponda as suas necessidades.
+ 7. Se Preferir mova os arquivos `backup.sh`, `patterns.lst`, `restore.sh` e o arquivo recem editado `.conf` para uma pasta de sua preferência.
+ 8. Torne os scripts executáveis `sudo chmod a+x`.
+ 9. Altere as variáveis `AssertPathIsDirectory --config --cache-info-age=60m e ExecStop=/bin/fusermount -u` no arquivo `Backup.service`.
+ 10. Mova o `Backup.service` para a pasta `/etc/systemd/system`.
+ 11. Execute o script `backup.sh`ou agende o mesmo no Cron 
  ````
  00 00 * * * sudo /path/to/backup.sh
  ```` 
@@ -82,13 +82,13 @@ Exemplo
 #echo "DONE!"
 ```
 
-5. Execute o script com a data desejada do backup a ser restaurado.
+2. Execute o script com a data desejada do backup a ser restaurado.
 
     Exemplo
    ```
    ./restore.sh 2023-07-15
    ```
-9. Caso a pasta `./Nextcloud/data` esteja armazenada em um HD Externo, altere as variáveis `DEVICE` e `MOUNTDIR` `NEXTCLOUD_DATA` em seu arquivo `.conf`, e descomente as linhas a seguir no arquivo `restore.sh:` 
+3. Caso a pasta `./Nextcloud/data` esteja armazenada em um HD Externo, altere as variáveis `DEVICE` e `MOUNTDIR` `NEXTCLOUD_DATA` em seu arquivo `.conf`, e descomente as linhas a seguir no arquivo `restore.sh:` 
 ```
 # NÃO ALTERE
 # MOUNT_FILE="/proc/mounts"
@@ -117,11 +117,18 @@ Exemplo
 
    - A Criptografia do arquivo `rclone.conf` é opcional, caso não tenha interesse descomente as linhas referente a gpg tanto no arquivo `backup.sh e restore.sh.`
  ```
- #gpg Descript
-
 /usr/bin/gpg --batch --no-tty --homedir $DIRGPG --passphrase-file $PASSFILE $RCLONECONFIG_CRIPT >> $RESTLOGFILE_PATH 2>&1
 ```
-  
+   - Recomendo fortemente que efetue a desmontagem da sua nuvem remota onde foi feito o backup para isso agende no cron para que isso ocorra de uma forma automatica
+ ````
+ 00 00 * * * sudo /path/to/backup.sh
+ 00 04 * * * sudo systemctl stop backup.service
+ ````
+Ou caso tenha criptografado o rclone.conf com GPG
+ ````
+ 00 00 * * * sudo /path/to/backup.sh
+ 00 04 * * * sudo systemctl stop backup.service | rm -rf /path/to/rclone.conf
+ ````
 ### Testes
 
  - Em testes realizados o tempo decorrido do backup e restauração foram semelhantes ao de outras ferramentas como `duplicity ou deja-dup.`
