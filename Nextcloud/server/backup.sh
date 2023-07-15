@@ -29,12 +29,12 @@ sudo systemctl start Backup.service
 # Ativando Modo de Manutenção
 
 echo
-sudo -u www-data php $NEXTCLOUDCONF/occ maintenance:mode --on >> $LOGFILE_PATH
+sudo -u www-data php $NEXTCLOUD_CONF/occ maintenance:mode --on >> $LOGFILE_PATH
 echo
 
 # Exporte o Banco de dados
 
-mysqldump --quick -n --host=$HOSTNAME $DATABASE_NAME --user=$USER_NAME --password=$PASSWORD > $NEXTCLOUD_DB
+mysqldump --quick -n --host=$HOSTNAME $DATABASE_NAME --user=$USER_NAME --password=$PASSWORD > "$NEXTCLOUD_CONF/nextclouddb_.sql"
 
 # Faça backup dos diretórios mais importantes em um arquivo com o nome
 # a máquina em que este script está sendo executado
@@ -75,7 +75,7 @@ prune_exit=$?
 # Desativando Modo de Manutenção Nextcloud
 
 echo  
-sudo -u www-data php $NEXTCLOUDCONF/occ maintenance:mode --off >> $LOGFILE_PATH
+sudo -u www-data php $NEXTCLOUD_CONF/occ maintenance:mode --off >> $LOGFILE_PATH
 echo
 
 # Desmonte o Rclone
