@@ -17,7 +17,7 @@ then
 fi
 
 #
-# DESCOMENTE AS LINHAS ABAIXO CASO DESEJE RESTAURAR O DIRETÓRIO ./nextcloud/data EM UM HD EXTERNO.   
+# Descomente as linhas a seguir se for preciso efetuar a restauração de arquivos ou pastas de armazenamento externo como pendrives e HD's Externos
 
 # NÃO ALTERE
 # MOUNT_FILE="/proc/mounts"
@@ -57,12 +57,29 @@ else
     exit 1
 fi
 
+# Verifica se a data de restauração foi especificada
+if [ -z "$ARCHIVE_DATE" ]
+then
+    echo "Por favor, especifique a data de restauração."
+    exit 1
+fi
+
+# Encontra o nome do arquivo de backup correspondente à data especificada
+ARCHIVE_NAME=$(borg list $BORG_REPO | grep $ARCHIVE_DATE | awk '{print $1}')
+
+# Verifica se o arquivo de backup foi encontrado
+if [ -z "$ARCHIVE_NAME" ]
+then
+    echo "Não foi possível encontrar um arquivo de backup para a data especificada: $ARCHIVE_DATE"
+    exit 1
+fi
+
 # Função para mensagens de erro
 errorecho() { cat <<< "$@" 1>&2; } 
 
-#gpg Descript
+# Caso tenha criptografado seu arquivo rclone.conf com GPG conforme instruções contidas no README, descomente as linhas a seguir
 
-/usr/bin/gpg --batch --no-tty --homedir $DIRGPG --passphrase-file $PASSFILE $RCLONECONFIG_CRIPT >> $RESTLOGFILE_PATH 2>&1
+#/usr/bin/gpg --batch --no-tty --homedir $DIRGPG --passphrase-file $PASSFILE $RCLONECONFIG_CRIPT >> $RESTLOGFILE_PATH 2>&1
 
 # Monte o Rclone
 
@@ -78,7 +95,7 @@ echo
 # 
 echo "Restaurando Arquivos " $RESTLOGFILE_PATH
 
-borg extract -v --list "$BORG_REPO::$(hostname)-$DATARESTORE" --patterns-from $PATTERNS >> $RESTLOGFILE_PATH 2>&1
+borg extract -v --list $BORG_REPO::$ARCHIVE_NAME --patterns-from $PATTERNS >> $RESTLOGFILE_PATH 2>&1
 
 # Desativando Modo de Manutenção Nextcloud
 
@@ -90,13 +107,10 @@ echo
 
 sudo nextcloud.import -abc $NEXTCLOUD_CONFIG >> $RESTLOGFILE_PATH
 
-# Backup Terminado 
+# Caso tenha criptografado seu arquivo rclone.conf com GPG é recomendável excluir o arquivo descriptografado apos a Restauração. 
+# Para isso descomente a linha a seguir.
 
-# Desmonte o Rclone
-sudo systemctl stop Backup.service
-
-# Por Segurança remova o rclone.conf
-rm -rf $RCLONECONFIG >> $RESTLOGFILE_PATH 2>&1 
+#rm -rf $RCLONECONFIG >> $RESTLOGFILE_PATH 2>&1 
 
 echo
 echo "DONE!"
