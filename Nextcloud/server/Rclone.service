@@ -1,0 +1,28 @@
+# /etc/systemd/system/rclone.service
+[Unit]
+Description=Onedrive (rclone)
+AssertPathIsDirectory=/mnt/rclone/Borg
+After=Multimidia.service
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/rclone mount \
+        --config=/path/user/rclone.conf \
+        --allow-other \
+        --cache-dir=/tmp/rclone/vfs \
+        --no-modtime \
+        --stats=0 \
+        --bwlimit=30M \
+        --dir-cache-time=120m \
+        --vfs-cache-mode full \
+        --vfs-cache-max-size 20G \
+	--user-agent "ISV|rclone.org|rclone/v1.62.2" \
+        --onedrive-no-versions \
+        --tpslimit 4 \
+        --cache-info-age=60m Borg:/ /mnt/rclone/Borg
+ExecStop=/bin/fusermount -u /mnt/rclone/Borg
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=default.target
