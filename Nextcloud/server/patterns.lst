@@ -1,0 +1,14 @@
+P sh
+R /
+
+# DIRETÓRIO CONTENDO SUAS CONFIGURAÇÕES EXPORTADAS
++ /var/www/nextcloud
+
+# DIRETÓRIO DE DADOS. CASO TENHA MOVIDO SUA PASTA ./nextcloud/data PARA OUTRO LOCAL ALTERE O CAMINHO ABAIXO
++ /var/www/nextcloud/data
+
+# NÃO INCLUA A LIXEIRA. CASO TENHA MOVIDO SUA PASTA ./nextcloud/data PARA OUTRO LOCAL ALTERE O CAMINHO ABAIXO
+- /var/www/nextcloud/data/*/files_trashbin
+
+# Não Inclua mais nada
+- **
