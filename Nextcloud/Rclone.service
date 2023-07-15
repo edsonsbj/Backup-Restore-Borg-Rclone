@@ -1,17 +1,16 @@
 # /etc/systemd/system/rclone.service
 [Unit]
 Description=Onedrive (rclone)
-AssertPathIsDirectory=/mnt/rclone/Onedrive
+AssertPathIsDirectory=/mnt/rclone/Borg
 After=Multimidia.service
 
 [Service]
 Type=simple
 ExecStart=/usr/bin/rclone mount \
-        --config=/home/edson/.config/rclone/ \
+        --config=/path/user/rclone.conf \
         --allow-other \
         --cache-dir=/tmp/rclone/vfs \
         --no-modtime \
-        --drive-use-trash \
         --stats=0 \
         --bwlimit=30M \
         --dir-cache-time=120m \
@@ -20,8 +19,8 @@ ExecStart=/usr/bin/rclone mount \
 	--user-agent "ISV|rclone.org|rclone/v1.62.2" \
         --onedrive-no-versions \
         --tpslimit 4 \
-        --cache-info-age=60m Onedrive/ /mnt/rclone/Onedrive
-ExecStop=/bin/fusermount -u /mnt/rclone/Onedrive
+        --cache-info-age=60m Borg:/ /mnt/rclone/Borg
+ExecStop=/bin/fusermount -u /mnt/rclone/Borg
 Restart=always
 RestartSec=10
 
