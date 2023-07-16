@@ -95,6 +95,8 @@ echo
 # 
 echo "Restaurando backup das configurações do Nextcloud" >> $RESTLOGFILE_PATH
 
+rm -rf $NEXTCLOUD_CONF
+
 borg extract -v --list $BORG_REPO::$ARCHIVE_NAME $NEXTCLOUD_CONF >> $RESTLOGFILE_PATH 2>&1
 
 echo
