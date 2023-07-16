@@ -59,7 +59,7 @@ Este Script realiza o Backup e a Restauração de sua instância Nextcloud insta
 ```
 **Restaure os dados**
 
-1. Em seu arquivo `restore.sh` comente o intervalo de linhas 94 a 11. 
+1. Em seu arquivo `restore.sh` comente o intervalo de linhas 94 a 111. 
 
 Exemplo
 ```
