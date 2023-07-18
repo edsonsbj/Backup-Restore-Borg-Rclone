@@ -17,24 +17,26 @@ Este Script realiza o Backup e a Restauração de sua instância Nextcloud insta
  8. Torne os scripts executáveis `sudo chmod a+x`.
  9. Altere as variáveis `AssertPathIsDirectory --config --cache-info-age=60m e ExecStop=/bin/fusermount -u` no arquivo `Backup.service`.
  10. Mova o `Backup.service` para a pasta `/etc/systemd/system`.
- 11. Execute o script `backup.sh`ou agende o mesmo no Cron 
+
+**Automatizando backup com Cron**
+
+ 1. Crie um novo trabalho no Cron `crontab -e` conforme exemplo abaixo 
  ````
- 00 00 * * * sudo /path/to/backup.sh
+00    00    *     *     * sudo /path/to/backup.sh     
+-     -     -     -     - -
+|     |     |     |     | |
+|     |     |     |     | +--- comando a ser executado
+|     |     |     |     +----- dia da semana (0 - 6) (Domingo=0)
+|     |     |     +------- mês (1 - 12)
+|     |     +--------- dia do mês (1 - 31)
+|     +----------- hora (0 - 23)
++------------- minuto (0 - 59)
  ```` 
-
-## **Integridade e Segurança do Backup & Restauração**
-
- 12. Este Conjunto de Scripts ele monta o seu serviço de nuvem como uma unidade local portanto para ter uma segurança melhor e não ter nenhum risco de perda de dados recomendo que efetue um agendamento no cron para que apos o backup ou a restauração a unidade seja desmontada do sistema e caso tenha optado pela criptografia do rclone.conf com gpg seja removido o arquivo descriptografado no inicio do backup.
-Exemplo:
- ````
- 00 00 * * * sudo /path/to/backup.sh 						# Efetua o Backup
- 00 2 * * * systemctl stop Backup.service | rm -rf /path/to/rclone.conf		# Desliga a Nuvem e remove o arquivo descritografado
- ```` 
-
 ## **Restauração**
 
-**Restaure todo o Servidor**
+Aqui temos dois tipos de restauração.
 
+**Restaure todo o Servidor**
 
  1. Execute o script com a data desejada do backup a ser restaurado.
 
@@ -138,6 +140,14 @@ Ou caso tenha criptografado o rclone.conf com GPG
  00 00 * * * sudo /path/to/backup.sh
  00 04 * * * sudo systemctl stop backup.service | rm -rf /path/to/rclone.conf
  ````
+## **Integridade e Segurança do Backup & Restauração**
+
+ 12. Este Conjunto de Scripts ele monta o seu serviço de nuvem como uma unidade local portanto para ter uma segurança melhor e não ter nenhum risco de perda de dados recomendo que efetue um agendamento no cron para que apos o backup ou a restauração a unidade seja desmontada do sistema e caso tenha optado pela criptografia do rclone.conf com gpg seja removido o arquivo descriptografado no inicio do backup.
+Exemplo:
+ ````
+ 00 00 * * * sudo /path/to/backup.sh 						# Efetua o Backup
+ 00 2 * * * systemctl stop Backup.service | rm -rf /path/to/rclone.conf		# Desliga a Nuvem e remove o arquivo descritografado
+ ```` 
 ### Testes
 
  - Em testes realizados o tempo decorrido do backup e restauração foram semelhantes ao de outras ferramentas como `duplicity ou deja-dup.`
