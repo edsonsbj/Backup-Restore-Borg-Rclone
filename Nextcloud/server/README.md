@@ -22,6 +22,15 @@ Este Script realiza o Backup e a Restauração de sua instância Nextcloud insta
  00 00 * * * sudo /path/to/backup.sh
  ```` 
 
+## **Integridade e Segurança do Backup & Restauração**
+
+ 12. Este Conjunto de Scripts ele monta o seu serviço de nuvem como uma unidade local portanto para ter uma segurança melhor e não ter nenhum risco de perda de dados recomendo que efetue um agendamento no cron para que apos o backup ou a restauração a unidade seja desmontada do sistema e caso tenha optado pela criptografia do rclone.conf com gpg seja removido o arquivo descriptografado no inicio do backup.
+Exemplo:
+ ````
+ 00 00 * * * sudo /path/to/backup.sh 						# Efetua o Backup
+ 00 2 * * * systemctl stop Backup.service | rm -rf /path/to/rclone.conf		# Desliga a Nuvem e remove o arquivo descritografado
+ ```` 
+
 ## **Restauração**
 
 **Restaure todo o Servidor**
