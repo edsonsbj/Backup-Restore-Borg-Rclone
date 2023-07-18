@@ -101,10 +101,9 @@ Aqui temos dois tipos de restauração.
  ```
  UUID=089342544239044F /mnt/Multimidia ntfs-3g utf8,uid=www-data,gid=www-data,umask=0007,noatime,x-gvfs-show 0 0
  ```
- Altere o UUID para corresponder ao UUID da unidade que sera montada. Para saber execute o comando `sudo blkid`.
- Altere `/mnt/Multimidia` para o ponto de montagem de sua preferência. Lembrando que se o ponto de montagem não existir, favor cria-lo com o comando `sudo mkdir /mnt/seu_pontodemontagem`.
- Altere `ntfs-3g` para o formato de partição desejado como exFAT ou FAT32.
-
+  - Altere o UUID para corresponder ao UUID da unidade que sera montada. Para saber execute o comando `sudo blkid`.
+  - Altere `/mnt/Multimidia` para o ponto de montagem de sua preferência. Lembrando que se o ponto de montagem não existir, favor cria-lo com o comando `sudo mkdir /mnt/seu_pontodemontagem`.
+  - Altere `ntfs-3g` para o formato de partição desejado como exFAT ou FAT32.
   - Execute o comando `sudo mount -a`
   - Em seu arquivo `restore.sh` descomente as linhas a seguir.
  
@@ -119,7 +118,6 @@ Aqui temos dois tipos de restauração.
   - Altere o UUID para corresponder ao UUID da unidade que sera montada. Para saber execute o comando `sudo blkid`.
   - Altere `/mnt/Multimidia` para o ponto de montagem de sua preferencia. Lembrando que se o ponto de montagem não existir, favor cria-lo com o comando `sudo mkdir /mnt/seu_pontodemontagem`.
   - Altere `ntfs-3g` para o formato de partição desejado como exFAT ou FAT32.
-
   - Execute o comando `sudo mount -a`
   - Em seu arquivo `restore.sh` descomente as linhas a seguir.
  
