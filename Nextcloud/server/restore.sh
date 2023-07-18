@@ -77,9 +77,9 @@ fi
 # Função para mensagens de erro
 errorecho() { cat <<< "$@" 1>&2; } 
 
-# Caso tenha criptografado seu arquivo rclone.conf com GPG conforme instruções contidas no README, descomente as linhas a seguir
+# Cria as pastas necessarias
 
-#/usr/bin/gpg --batch --no-tty --homedir $DIRGPG --passphrase-file $PASSFILE $RCLONECONFIG_CRIPT >> $RESTLOGFILE_PATH 2>&1
+mkdir /mnt/rclone /var/log/Rclone /var/log/Borg
 
 # Monte o Rclone
 
@@ -90,6 +90,10 @@ sudo systemctl start Backup.service
 echo
 sudo -u www-data php $NEXTCLOUD_CONF/occ maintenance:mode --on >> $RESTLOGFILE_PATH
 echo 
+
+# Pare o Apache
+
+systemctl stop apache2
 
 # Restaura o backup do Nextcloud 
 # 
@@ -139,16 +143,15 @@ chown -R www-data:www-data $NEXTCLOUD_CONF
 echo
 echo "DONE!"
 
+# Inicia o Apache
+
+systemctl start apache2
+
 # Desativando Modo de Manutenção Nextcloud
 
 echo  
 sudo -u www-data php $NEXTCLOUD_CONF/occ maintenance:mode --off >> $RESTLOGFILE_PATH
 echo
-
-# Caso tenha criptografado seu arquivo rclone.conf com GPG é recomendável excluir o arquivo descriptografado apos a Restauração. 
-# Para isso descomente a linha a seguir.
-
-#rm -rf $RCLONECONFIG >> $RESTLOGFILE_PATH 2>&1 
 
 echo
 echo "DONE!"

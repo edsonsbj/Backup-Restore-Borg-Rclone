@@ -18,9 +18,9 @@ fi
 
 info "Backup Iniciado" 2>&1 | tee -a $LOGFILE_PATH
 
-# Caso tenha criptografado o arquivo rclone.conf com GPG descomente a linha abaixo.
+# Cria as Pastas Necessarias
 
-# /usr/bin/gpg --batch --no-tty --homedir $DIRGPG --passphrase-file $PASSFILE $RCLONECONFIG_CRIPT >> $LOGFILE_PATH 2>&1
+mkdir /mnt/rclone /var/log/Rclone /var/log/Borg
 
 # Monte o Rclone
 
@@ -78,12 +78,6 @@ echo
 sudo -u www-data php $NEXTCLOUD_CONF/occ maintenance:mode --off >> $LOGFILE_PATH
 echo
 
-# Desmonte o Rclone
-
-# sudo systemctl stop Backup.service
-
-# Descomente a linha abaixo caso tenha criptografado o arquivo rclone.conf com GPG para que o script remova o arquivo descriptografado. 
-# rm -rf $RCLONECONFIG 
 
 # usa o código de saída mais alto como código de saída global
 global_exit=$(( backup_exit > prune_exit ? backup_exit : prune_exit ))
