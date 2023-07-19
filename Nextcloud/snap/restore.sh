@@ -57,6 +57,14 @@ else
     exit 1
 fi
 
+# Cria as pastas necessarias
+
+mkdir /mnt/rclone /var/log/Rclone /var/log/Borg
+
+# Monte o Rclone
+
+sudo systemctl start Backup.service
+
 # Verifica se a data de restauração foi especificada
 if [ -z "$ARCHIVE_DATE" ]
 then
@@ -77,40 +85,61 @@ fi
 # Função para mensagens de erro
 errorecho() { cat <<< "$@" 1>&2; } 
 
-# Caso tenha criptografado seu arquivo rclone.conf com GPG conforme instruções contidas no README, descomente as linhas a seguir
-
-#/usr/bin/gpg --batch --no-tty --homedir $DIRGPG --passphrase-file $PASSFILE $RCLONECONFIG_CRIPT >> $RESTLOGFILE_PATH 2>&1
-
-# Monte o Rclone
-
-sudo systemctl start Backup.service
-
 # Ativando Modo de Manutenção
 
 echo
-sudo nextcloud.occ maintenance:mode --on >> $RESTLOGFILE_PATH
-echo
+sudo nextcloud.occ maintenance:mode --on >> $LOGFILE_PATH
+echo 
 
-# Extraia os arquivos 
+# Restaura as configurações do Nextcloud 
 # 
-echo "Restaurando Arquivos " $RESTLOGFILE_PATH
+echo "Restaurando backup das configurações do Nextcloud" >> $RESTLOGFILE_PATH
 
-borg extract -v --list $BORG_REPO::$ARCHIVE_NAME --patterns-from $PATTERNS >> $RESTLOGFILE_PATH 2>&1
+borg extract -v --list $BORG_REPO::$ARCHIVE_NAME $NEXTCLOUD_CONF >> $RESTLOGFILE_PATH 2>&1
+
+# Verifique se o arquivo de backup existe
+if [ -z "RESTORE_FILE" ]; then
+    echo "Nenhum arquivo de backup encontrado"
+    exit 1
+fi
+
+sudo nextcloud.import -abc $RESTORE_FILE >> $RESTLOGFILE_PATH
+
+echo
+echo "DONE!"
+
+# Restaura a pasta ./data Nextcloud.
+# Útil se a pasta ./data estiver fora de /var/www/nextcloud caso contrario recomendo comentar a linha abaixo, pois seu servidor já estará restaurado com o comando acima. 
+# 
+echo "Restaurando backup da pasta ./data" >> $RESTLOGFILE_PATH
+
+borg extract -v --list $BORG_REPO::$ARCHIVE_NAME $NEXTCLOUD_DATA >> $RESTLOGFILE_PATH 2>&1
+
+echo
+echo "DONE!"
+
+# Restaura as permissões 
+
+chmod -R 770 $NEXTCLOUD_DATA 
+chown -R root:root $NEXTCLOUD_DATA
+chown -R root:root $NEXTCLOUD_CONF
+
+# Para sistemas de arquivos NTFS e FAT32 entre outros que não aceitam permissões convêm adicionar uma entrada em seu arquivo /etc/fstab para isso descomente a linha abaixo e altere o UUID /mnt/SEUHD e o campo ntfs-3g.
+# Para encontrar o UUID de sua partição ou HD execute o comando sudo blkid. 
+
+#cp /etc/fstab /etc/fstab.bk
+#sudo cat <<EOF >>/etc/fstab
+#UUID=089342544239044F /mnt/SEUHD ntfs-3g utf8,uid=www-data,gid=www-data,umask=0007,noatime,x-gvfs-show 0 0
+#EOF
+
+echo
+echo "DONE!"
 
 # Desativando Modo de Manutenção Nextcloud
 
-echo  
-sudo nextcloud.occ maintenance:mode --off >> $RESTLOGFILE_PATH
 echo
-
-# Restaurando Configurações Nextcloud 
-
-sudo nextcloud.import -abc $NEXTCLOUD_CONFIG >> $RESTLOGFILE_PATH
-
-# Caso tenha criptografado seu arquivo rclone.conf com GPG é recomendável excluir o arquivo descriptografado apos a Restauração. 
-# Para isso descomente a linha a seguir.
-
-#rm -rf $RCLONECONFIG >> $RESTLOGFILE_PATH 2>&1 
+sudo nextcloud.occ maintenance:mode --off >> $LOGFILE_PATH
+echo
 
 echo
 echo "DONE!"
