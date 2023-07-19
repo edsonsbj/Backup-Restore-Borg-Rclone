@@ -11,12 +11,12 @@ Este Script realiza o Backup e a Restauração de sua instância Nextcloud insta
 ## **Backup**
 
   - Faça uma copia do arquivo `example.conf` e o renomeie.
-  - Adicione as pastas para fazer backup no arquivo `patterns.lst`. Por Padrão o arquivo já esta pré-configurado para fazer backup das pastas `/var/www/nextcloud` `/path/nextcloud/data` e excluir do backup a pasta `./files_trashbin`.
+  - Adicione as pastas para fazer backup no arquivo `patterns.lst`. Por Padrão o arquivo já esta pré-configurado para fazer backup das pastas `/var/www/nextcloud` `/var/www/nextcloud/data` e excluir do backup a pasta `./files_trashbin`.
   - Defina as variáveis em seu arquivo `.conf`, para que corresponda as suas necessidades.
   - Opicionalmente mova os arquivos `backup.sh`, `patterns.lst`, `restore.sh` e o arquivo recem editado `.conf` para uma pasta de sua preferência.
   - Torne os scripts executáveis `sudo chmod +x`.
   - Altere as variáveis `AssertPathIsDirectory --config --cache-info-age=60m e ExecStop=/bin/fusermount -u` no arquivo `Backup.service`.
-  - Mova o `Backup.service` para a pasta `/etc/systemd/system`.
+  - Mova o `Backup.service` para a pasta `/etc/systemd/system/`.
   - Execute o Script `./backup.sh`, ou crie um novo trabalho no Cron `crontab -e` conforme exemplo abaixo para que seu backup .
 
  ````
@@ -65,7 +65,7 @@ Aqui temos dois tipos de restauração.
    ./restore.sh 2023-07-15
    ```
 
-**Restaurando os dados em outras partições ou HD**
+**Restaurando os dados em Mídia removível**
 
   - Altere as variáveis `DEVICE` e `MOUNTDIR` `NEXTCLOUD_DATA` em seu arquivo `.conf`.
   - Em seu arquivo `restore.sh` descomente as linhas a seguir. 
@@ -93,57 +93,18 @@ Aqui temos dois tipos de restauração.
  # }
  ```
 
-**Restaurando os dados em partições NTFS exFAT e FAT32**
+**Para Partições e Mídias em formato NTFS exFAT e FAT32**
 
-  - Altere as variáveis `DEVICE` e `MOUNTDIR` `NEXTCLOUD_DATA` em seu arquivo `.conf`.
   - Adicione a seguinte entrada no arquivo `/etc/fstab`
 
  ```
  UUID=089342544239044F /mnt/Multimidia ntfs-3g utf8,uid=www-data,gid=www-data,umask=0007,noatime,x-gvfs-show 0 0
  ```
-  - Altere o UUID para corresponder ao UUID da unidade que sera montada. Para saber execute o comando `sudo blkid`.
+  - Altere o `UUID` para corresponder ao `UUID` da unidade que sera montada. Para saber execute o comando `sudo blkid`.
   - Altere `/mnt/Multimidia` para o ponto de montagem de sua preferência. Lembrando que se o ponto de montagem não existir, favor cria-lo com o comando `sudo mkdir /mnt/seu_pontodemontagem`.
   - Altere `ntfs-3g` para o formato de partição desejado como exFAT ou FAT32.
-  - Execute o comando `sudo mount -a`
-  - Em seu arquivo `restore.sh` descomente as linhas a seguir.
- 
-**Restaurando os dados em partições NTFS exFAT e FAT32**
-
-  - Altere as variáveis `DEVICE` e `MOUNTDIR` `NEXTCLOUD_DATA` em seu arquivo `.conf`.
-  - Adicione a seguinte entrada no arquivo `/etc/fstab`
-
- ```
- UUID=089342544239044F /mnt/Multimidia ntfs-3g utf8,uid=www-data,gid=www-data,umask=0007,noatime,x-gvfs-show 0 0
- ```
-  - Altere o UUID para corresponder ao UUID da unidade que sera montada. Para saber execute o comando `sudo blkid`.
-  - Altere `/mnt/Multimidia` para o ponto de montagem de sua preferencia. Lembrando que se o ponto de montagem não existir, favor cria-lo com o comando `sudo mkdir /mnt/seu_pontodemontagem`.
-  - Altere `ntfs-3g` para o formato de partição desejado como exFAT ou FAT32.
-  - Execute o comando `sudo mount -a`
-  - Em seu arquivo `restore.sh` descomente as linhas a seguir.
- 
- ```
- # NÃO ALTERE
- # MOUNT_FILE="/proc/mounts"
- # NULL_DEVICE="1> /dev/null 2>&1"
- # REDIRECT_LOG_FILE="1>> $LOGFILE_PATH 2>&1" 
-
- # O Dispositivo está Montado?
- # grep -q "$DEVICE" "$MOUNT_FILE"
- # if [ "$?" != "0" ]; then
- # Se não, monte em $MOUNTDIR
- # echo " Dispositivo não montado. Monte $DEVICE " >> $LOGFILE_PATH
- # eval mount -t auto "$DEVICE" "$MOUNTDIR" "$NULL_DEVICE"
- # else
- # Se sim, grep o ponto de montagem e altere o $MOUNTDIR
- # DESTINATIONDIR=$(grep "$DEVICE" "$MOUNT_FILE" | cut -d " " -f 2)
- # fi
-
- # Há permissões de excrita e gravação?
- # [ ! -w "$MOUNTDIR" ] && {
- # echo " Não tem permissões de gravação " >> $LOGFILE_PATH
- # exit 1
- # }
- ```
+  - Execute o comando `sudo mount -a.`
+  - Caso ocorra algum erro ao executar o comando acima primeiro verifique se o ponto de montagem existe, caso o mesmo não exista execute o comando `mkdir /mnt/MeuArmazenamento` ou `/media/edson/MeuArmazenamento` e tente executar o comando acima novamente se o erro persistir recomendo que instale os pacotes `ntfs-3g` para partições `NTFS` ou `exfat-fuse e exfat-utils` para partições `exfat.`
  
  ### Algumas Observações Importantes 
 
