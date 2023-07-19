@@ -15,9 +15,9 @@ Este Script realiza o Backup e a Restauração de sua instância Nextcloud insta
   - Defina as variáveis em seu arquivo `.conf`, para que corresponda as suas necessidades.
   - Opicionalmente mova os arquivos `backup.sh`, `patterns.lst`, `restore.sh` e o arquivo recem editado `.conf` para uma pasta de sua preferência.
   - Torne os scripts executáveis `sudo chmod +x`.
-  - Altere as variáveis `AssertPathIsDirectory --config --cache-info-age=60m e ExecStop=/bin/fusermount -u` no arquivo `Backup.service`.
+  - Substitua os valores `--config=/path/user/rclone.conf` e `Borg:/` no arquivo `Backup.service` pelas configurações apropriadas onde `--config` corresponda ao local do seu arquivo `rclone.conf` e `Borg:/` o seu remoto (nuvem) a ser montada.
   - Mova o `Backup.service` para a pasta `/etc/systemd/system/`.
-  - Execute o Script `./backup.sh`, ou crie um novo trabalho no Cron `crontab -e` conforme exemplo abaixo para que seu backup .
+  - Execute o Script `./backup.sh`, ou crie um novo trabalho no Cron `crontab -e` conforme exemplo abaixo.
 
  ````
  00 00 * * * sudo ./backup.sh
@@ -25,7 +25,7 @@ Este Script realiza o Backup e a Restauração de sua instância Nextcloud insta
 
 ## **Restauração**
 
-Aqui temos dois tipos de restauração.
+Opções de Restauração.
 
 ### **Restaure todo o Servidor**
 
@@ -65,7 +65,7 @@ Aqui temos dois tipos de restauração.
    ./restore.sh 2023-07-15
    ```
 
-### **Restaurando os dados em Mídia removível**
+### **Restaure os dados em Mídia removível**
 
   - Altere as variáveis `DEVICE` e `MOUNTDIR` `NEXTCLOUD_DATA` em seu arquivo `.conf`.
   - Em seu arquivo `restore.sh` descomente as linhas a seguir. 

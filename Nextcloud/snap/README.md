@@ -15,9 +15,9 @@ Este Script realiza o Backup e a Restauração de sua instância `Nextcloud` ins
   - Defina as variáveis em seu arquivo `.conf`, para que corresponda as suas necessidades.
   - Opicionalmente mova os arquivos `backup.sh`, `patterns.lst`, `restore.sh` e o arquivo recem editado `.conf` para uma pasta de sua preferência.
   - Torne os scripts executáveis `sudo chmod +x`.
-  - Altere as variáveis `AssertPathIsDirectory --config --cache-info-age=60m e ExecStop=/bin/fusermount -u` no arquivo `Backup.service`.
+  - Substitua os valores `--config=/path/user/rclone.conf` e `Borg:/` no arquivo `Backup.service` pelas configurações apropriadas onde `--config` corresponda ao local do seu arquivo `rclone.conf` e `Borg:/` o seu remoto (nuvem) a ser montada.
   - Mova o `Backup.service` para a pasta `/etc/systemd/system`.
-  - Execute o Script `./backup.sh`, ou crie um novo trabalho no Cron `crontab -e` conforme exemplo abaixo para que seu backup .
+  - Execute o Script `./backup.sh`, ou crie um novo trabalho no Cron `crontab -e` conforme exemplo abaixo.
 
  ````
  00 00 * * * sudo ./backup.sh
@@ -25,9 +25,9 @@ Este Script realiza o Backup e a Restauração de sua instância `Nextcloud` ins
 
 ## **Restauração**
 
-Aqui temos alguns tipos de restauração.
+Opções de Restauração.
 
-**Restauração completa**
+### **Restaure todo o servidor*
 
   - Execute o script com a data desejada do backup a ser restaurado.
 
@@ -35,7 +35,7 @@ Aqui temos alguns tipos de restauração.
    ./restore.sh 2023-07-15
    ```
 
-**Restauração das Configurações**
+### **Restaure as Configurações**
 
   - Em seu arquivo `restore.sh` comente o intervalo de linhas abaixo.
 
@@ -56,7 +56,7 @@ Aqui temos alguns tipos de restauração.
    ./restore.sh 2023-07-15
    ```
 
-**Restauração dos dados**
+### **Restaure os dados**
 
   - Em seu arquivo `restore.sh` comente o intervalo de linhas abaixo. 
 
@@ -85,7 +85,7 @@ Aqui temos alguns tipos de restauração.
    ./restore.sh 2023-07-15
    ```
 
-**Restaurando os dados em Mídia removível**
+### **Restaure os dados em Mídia removível**
 
   - Altere as variáveis `DEVICE` e `MOUNTDIR` `NEXTCLOUD_DATA` em seu arquivo `.conf`.
   - Em seu arquivo `restore.sh` descomente as linhas a seguir. 
@@ -122,7 +122,7 @@ Aqui temos alguns tipos de restauração.
   ./restore.sh 2023-07-15
   ```
 
-**Restaurando os dados em Mídia removível ->> NTFS exFAT e FAT32**
+### **Para Partições e Mídias em formato NTFS exFAT e FAT32**
 
   - Altere as variáveis `DEVICE` e `MOUNTDIR` `NEXTCLOUD_DATA` em seu arquivo `.conf`.
   - Adicione a seguinte entrada no arquivo `/etc/fstab`
@@ -135,43 +135,8 @@ Aqui temos alguns tipos de restauração.
   - Altere `ntfs-3g` para o formato de partição desejado como exFAT ou FAT32.
   - Execute o comando `sudo mount -a`
   - Caso ocorra algum erro ao executar o comando acima primeiro verifique se o ponto de montagem existe, caso o mesmo não exista execute o comando `mkdir /mnt/MeuArmazenamento` ou `/media/edson/MeuArmazenamento` e tente executar o comando acima novamente se o erro persistir recomendo que instale os pacotes `ntfs-3g` para partições `NTFS` ou `exfat-fuse e exfat-utils` para partições `exfat`
-  - Em seu arquivo `restore.sh` descomente as linhas a seguir.
- 
- ```
- # NÃO ALTERE
- # MOUNT_FILE="/proc/mounts"
- # NULL_DEVICE="1> /dev/null 2>&1"
- # REDIRECT_LOG_FILE="1>> $LOGFILE_PATH 2>&1" 
 
- # O Dispositivo está Montado?
- # grep -q "$DEVICE" "$MOUNT_FILE"
- # if [ "$?" != "0" ]; then
- # Se não, monte em $MOUNTDIR
- # echo " Dispositivo não montado. Monte $DEVICE " >> $LOGFILE_PATH
- # eval mount -t auto "$DEVICE" "$MOUNTDIR" "$NULL_DEVICE"
- # else
- # Se sim, grep o ponto de montagem e altere o $MOUNTDIR
- # DESTINATIONDIR=$(grep "$DEVICE" "$MOUNT_FILE" | cut -d " " -f 2)
- # fi
-
- # Há permissões de excrita e gravação?
- # [ ! -w "$MOUNTDIR" ] && {
- # echo " Não tem permissões de gravação " >> $LOGFILE_PATH
- # exit 1
- # }
- ```
-  - Habilite o acesso a midias removiveis no nextcloud com o comando
-  ```
-  $ sudo snap connect nextcloud:removable-media
-  ```
-
-  - Execute o script com a data desejada do backup a ser restaurado.
-
-  ```
-  ./restore.sh 2023-07-15
-  ```
-
- ### Algumas Observações Importantes 
+## Algumas Observações Importantes 
 
   - Recomendo fortemente que efetue a desmontagem da unidade local onde foi efetuado o backup, para isso crie um agendamento no cron para que a unidade seja desmontada em um intervalo de 3 horas após início do backup.  
   ````
@@ -180,6 +145,6 @@ Aqui temos alguns tipos de restauração.
   ````
 No meu caso o backup demora entre 1 e 2 horas aí deixo sempre um intervalo para que o rclone consigo completar o upload corretamente dos arquivos para a nuvem. 
 
-### Testes
+## Testes
 
   - Em testes realizados o tempo decorrido do backup e restauração foram semelhantes ao de outras ferramentas como `duplicity ou deja-dup.`

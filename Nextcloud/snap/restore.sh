@@ -59,7 +59,7 @@ fi
 
 # Cria as pastas necessarias
 
-mkdir /mnt/rclone /var/log/Rclone /var/log/Borg
+mkdir /mnt/rclone/Borg /var/log/Rclone /var/log/Borg
 
 # Monte o Rclone
 
