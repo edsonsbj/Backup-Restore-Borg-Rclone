@@ -4,9 +4,6 @@ R /
 # DIRETÓRIO CONTENDO SUAS CONFIGURAÇÕES EXPORTADAS
 + /var/snap/nextcloud/common/backups/*.tar.gz
 
-# DIRETÓRIO CONTENDO SEUS CERTIFICADOS
-+ /var/snap/nextcloud/current/certs
-
 # DIRETÓRIO DE DADOS. CASO TENHA MOVIDO SUA PASTA ./nextcloud/data PARA OUTRO LOCAL ALTERE O CAMINHO ABAIXO
 + /var/snap/nextcloud/common/nextcloud/data
 
