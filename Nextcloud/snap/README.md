@@ -1,6 +1,6 @@
 # **Nextcloud**
 
-Este Script realiza o Backup e a Restauração de sua instância Nextcloud instalada por meio de pacotes snap, assim como sua pasta de dados que geralmente é armazenada em `/data`. Utilizando a Ferramenta de Backup Borg que por sua vez cria um repositorio remoto em um serviço de nuvem de sua preferencia utilizando uma montagem Rclone.
+Este Script realiza o Backup e a Restauração de sua instância `Nextcloud` instalada por meio de pacotes `snap`, assim como sua pasta de dados `./data`. Utilizando a Ferramenta de Backup `Borg` que por sua vez cria um repositorio remoto em um serviço de nuvem de sua preferencia utilizando uma montagem `Rclone`.
 
 ## **Vamos Começar**
 
@@ -50,6 +50,11 @@ Aqui temos alguns tipos de restauração.
  echo
  echo "DONE!"
  ```
+  - Execute o script com a data desejada do backup a ser restaurado.
+
+   ```
+   ./restore.sh 2023-07-15
+   ```
 
 **Restauração dos dados**
 
@@ -80,7 +85,7 @@ Aqui temos alguns tipos de restauração.
    ./restore.sh 2023-07-15
    ```
 
-**Restaurando os dados em outras partições ou HD**
+**Restaurando os dados em Mídia removível**
 
   - Altere as variáveis `DEVICE` e `MOUNTDIR` `NEXTCLOUD_DATA` em seu arquivo `.conf`.
   - Em seu arquivo `restore.sh` descomente as linhas a seguir. 
@@ -108,12 +113,16 @@ Aqui temos alguns tipos de restauração.
  # }
  ```
  
+  - Habilite o acesso a midias removiveis no nextcloud com o comando
+  ```
+  $ sudo snap connect nextcloud:removable-media
+  ```
   - Execute o script com a data desejada do backup a ser restaurado.
   ```
   ./restore.sh 2023-07-15
   ```
 
-**Restaurando os dados em partições NTFS exFAT e FAT32**
+**Restaurando os dados em Mídia removível ->> NTFS exFAT e FAT32**
 
   - Altere as variáveis `DEVICE` e `MOUNTDIR` `NEXTCLOUD_DATA` em seu arquivo `.conf`.
   - Adicione a seguinte entrada no arquivo `/etc/fstab`
@@ -151,6 +160,10 @@ Aqui temos alguns tipos de restauração.
  # exit 1
  # }
  ```
+  - Habilite o acesso a midias removiveis no nextcloud com o comando
+  ```
+  $ sudo snap connect nextcloud:removable-media
+  ```
 
   - Execute o script com a data desejada do backup a ser restaurado.
 
