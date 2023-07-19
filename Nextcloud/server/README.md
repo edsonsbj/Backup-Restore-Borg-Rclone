@@ -27,7 +27,7 @@ Este Script realiza o Backup e a Restauração de sua instância Nextcloud insta
 
 Aqui temos dois tipos de restauração.
 
-**Restaure todo o Servidor**
+### **Restaure todo o Servidor**
 
   - Execute o script com a data desejada do backup a ser restaurado.
 
@@ -35,7 +35,7 @@ Aqui temos dois tipos de restauração.
    ./restore.sh 2023-07-15
    ```
 
-**Restaure somente os dados**
+### **Restaure somente os dados**
 
   - Em seu arquivo `restore.sh` comente o intervalo de linhas abaixo. 
 
@@ -65,7 +65,7 @@ Aqui temos dois tipos de restauração.
    ./restore.sh 2023-07-15
    ```
 
-**Restaurando os dados em Mídia removível**
+### **Restaurando os dados em Mídia removível**
 
   - Altere as variáveis `DEVICE` e `MOUNTDIR` `NEXTCLOUD_DATA` em seu arquivo `.conf`.
   - Em seu arquivo `restore.sh` descomente as linhas a seguir. 
@@ -93,7 +93,7 @@ Aqui temos dois tipos de restauração.
  # }
  ```
 
-**Para Partições e Mídias em formato NTFS exFAT e FAT32**
+### **Para Partições e Mídias em formato NTFS exFAT e FAT32**
 
   - Adicione a seguinte entrada no arquivo `/etc/fstab`
 
@@ -106,7 +106,7 @@ Aqui temos dois tipos de restauração.
   - Execute o comando `sudo mount -a.`
   - Caso ocorra algum erro ao executar o comando acima primeiro verifique se o ponto de montagem existe, caso o mesmo não exista execute o comando `mkdir /mnt/MeuArmazenamento` ou `/media/edson/MeuArmazenamento` e tente executar o comando acima novamente se o erro persistir recomendo que instale os pacotes `ntfs-3g` para partições `NTFS` ou `exfat-fuse e exfat-utils` para partições `exfat.`
  
- ### Algumas Observações Importantes 
+ ## Algumas Observações Importantes 
 
   - Recomendo fortemente que efetue a desmontagem da unidade local onde foi efetuado o backup, para isso crie um agendamento no cron para que a unidade seja desmontada em um intervalo de 3 horas após início do backup.  
   ````
@@ -115,6 +115,6 @@ Aqui temos dois tipos de restauração.
   ````
 No meu caso o backup demora entre 1 e 2 horas aí deixo sempre um intervalo para que o rclone consigo completar o upload corretamente dos arquivos para a nuvem. 
 
-### Testes
+## Testes
 
   - Em testes realizados o tempo decorrido do backup e restauração foram semelhantes ao de outras ferramentas como `duplicity ou deja-dup.`
