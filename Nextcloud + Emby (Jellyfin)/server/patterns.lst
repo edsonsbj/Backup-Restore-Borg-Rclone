@@ -9,17 +9,17 @@ R /
 + /var/lib/emby/root
 + /var/lib/emby/ssl
 
-# DIRETÓRIO CONTENDO SUAS CONFIGURAÇÕES EXPORTADAS
-+ /var/snap/nextcloud/common/backups
+# DIRETÓRIOS PARA BACKUP JELLYFIN
+# + /var/lib/jellyfin
 
-# DIRETÓRIO CONTENDO SEUS CERTIFICADOS
-+ /var/snap/nextcloud/current/certs
+#DIRETÓRIO CONTENDO SUAS CONFIGURAÇÕES EXPORTADAS
++ /var/www/nextcloud
 
 # DIRETÓRIO DE DADOS. CASO TENHA MOVIDO SUA PASTA ./nextcloud/data PARA OUTRO LOCAL ALTERE O CAMINHO ABAIXO
-+ /var/snap/nextcloud/common/nextcloud/data
++ /var/www/nextcloud/data
 
 # NÃO INCLUA A LIXEIRA. CASO TENHA MOVIDO SUA PASTA ./nextcloud/data PARA OUTRO LOCAL ALTERE O CAMINHO ABAIXO
-- /var/snap/nextcloud/common/nextcloud/data/*/files_trashbin
+- /var/www/nextcloud/data/*/files_trashbin
 
 # Não Inclua mais nada
 - **

@@ -18,23 +18,27 @@ fi
 
 info "Backup Iniciado" 2>&1 | tee -a $LOGFILE_PATH
 
-#gpg Descript
+# Cria as Pastas Necessarias
 
-/usr/bin/gpg --batch --no-tty --homedir $DIRGPG --passphrase-file $PASSFILE $RCLONECONFIG_CRIPT >> $LOGFILE_PATH 2>&1
+mkdir /mnt/rclone /var/log/Rclone /var/log/Borg
 
 # Monte o Rclone
 
 sudo systemctl start Backup.service
 
-# Exporte as Configurações do Nextcloud
+# Pare o Emby
 
-sudo nextcloud.export -abc >> $LOGFILE_PATH
+sudo systemctl stop emby-server.service
 
 # Ativando Modo de Manutenção
 
 echo
-sudo nextcloud.occ maintenance:mode --on >> $LOGFILE_PATH
+sudo -u www-data php $NEXTCLOUD_CONF/occ maintenance:mode --on >> $LOGFILE_PATH
 echo
+
+# Exporte o Banco de dados
+
+mysqldump --quick -n --host=$HOSTNAME $DATABASE_NAME --user=$USER_NAME --password=$PASSWORD > "$NEXTCLOUD_CONF/nextclouddb_.sql"
 
 # Faça backup dos diretórios mais importantes em um arquivo com o nome
 # a máquina em que este script está sendo executado
@@ -75,15 +79,12 @@ prune_exit=$?
 # Desativando Modo de Manutenção Nextcloud
 
 echo  
-sudo nextcloud.occ maintenance:mode --off >> $LOGFILE_PATH
+sudo -u www-data php $NEXTCLOUD_CONF/occ maintenance:mode --off >> $LOGFILE_PATH
 echo
 
-# Desmonte o Rclone
+# Inicie o Emby
 
-sudo systemctl stop Backup.service
-
-# Por Seguranção remova o rclone.conf 
-rm -rf $RCLONECONFIG 
+sudo systemctl start emby-server.service
 
 # usa o código de saída mais alto como código de saída global
 global_exit=$(( backup_exit > prune_exit ? backup_exit : prune_exit ))
