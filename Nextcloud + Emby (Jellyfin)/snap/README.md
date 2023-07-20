@@ -31,15 +31,15 @@ Este script realiza o backup e a restauração de sua instância Nextcloud, incl
 
  Comenta as linhas referente ao emby no arquivo `patterns.lst`.
  ````
-  sudo sed -i '5,10s/^/# /g' "/path/to/patterns.lst"
+ sudo sed -i '5,10s/^/# /g' "/path/to/patterns.lst"
  ````
  Descomenta a linha referente ao Jellyfin no arquivo `patterns.lst`.
  ````
-  sudo sed -i '13s/^# //' "/path/to/patterns.lst"
+ sudo sed -i '13s/^# //' "/path/to/patterns.lst"
  ````
  Altera a variável `EMBY_CONF` para corresponder a pasta de configurações do Jellyfin no arquivo ``example.conf`.
  ````
-  sed -i "s/\EMBY_CONF=\"\/var\/lib\/emby\"/\$EMBY_CONF=\"\/var\/lib\/jellyfin\"/g"  "/path/to/patterns.lst"
+ sudo sed -i "s/\EMBY_CONF=\"\/var\/lib\/emby\"/\$EMBY_CONF=\"\/var\/lib\/jellyfin\"/g"  "/path/to/patterns.lst"
  ````
  Faça as alterações necessarias no script `backup.sh` e `restore.sh`.
  
@@ -47,10 +47,10 @@ Este script realiza o backup e a restauração de sua instância Nextcloud, incl
  sudo sed -i 's/emby-server.service/jellyfin.service/g' "/path/to/backup.sh"
  ````
  ````
-  sudo sed -i 's/chown -R emby:emby/chown -R jellyfin:jellyfin/g' "/path/to/restore.sh"
+ sudo sed -i 's/chown -R emby:emby/chown -R jellyfin:jellyfin/g' "/path/to/restore.sh"
  ````
  ````
-  sudo sed -i 's/sudo adduser emby root/sudo adduser jellyfin root/g' "/path/to/Nextcloud + Emby (Jellyfin)/snap/restore.sh"
+ sudo sed -i 's/sudo adduser emby root/sudo adduser jellyfin root/g' "/path/to/Nextcloud + Emby (Jellyfin)/snap/restore.sh"
  ````
  ````
  sudo sed -i 's/emby-server.service/jellyfin.service/g' "/path/to/restore.sh"
