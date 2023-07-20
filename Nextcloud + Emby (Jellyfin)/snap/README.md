@@ -14,6 +14,7 @@ Este script realiza o backup e a restauração de sua instância Nextcloud, incl
   - Faça uma copia do arquivo `example.conf` e renomeie-o de acordo com suas necessidades.
   - Adicione as pastas que deseja fazer backup no arquivo `patterns.lst`. Por padrão, o arquivo já está pré-configurado para fazer backup das pastas do `Nextcloud`, incluindo a pasta de dados, excluindo a lixeira e também a pasta de configuração do `Emby (Jellyfin)`.
   - Defina as variáveis no arquivo `.conf` para corresponder às suas necessidades.  - Opcionalmente, mova os arquivos `backup.sh`, `patterns.lst`, `restore.sh` e o arquivo `.conf` recém-editado para uma pasta de sua preferência.
+  - Opcionalmente, mova os arquivos `backup.sh`, `patterns.lst`, `restore.sh` e o arquivo `.conf` recém-editado para uma pasta de sua preferência.
   - Torne os scripts executáveis usando o comando `sudo chmod +x`.
   - Substitua os valores `--config=/path/user/rclone.conf` e `Borg:`/ no arquivo `Backup.service` pelas configurações apropriadas, onde `--config` corresponde ao local do seu arquivo `rclone.conf` e `Borg:/` corresponde ao seu remoto (nuvem) a ser montado.
   - Mova o `Backup.service` para a pasta `/etc/systemd/system/`.
