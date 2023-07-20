@@ -1,4 +1,4 @@
-# **Nextcloud server + Emby (jellyfin)**
+# **Nextcloud server + PLEX**
 
 Este script realiza o backup e a restauração de sua instância Nextcloud, incluindo a pasta de dados e as configurações do servidor PLEX. Ele usa o Borg Backup com uma montagem Rclone para armazenar seus backups em um serviço de nuvem de sua escolha.
 
