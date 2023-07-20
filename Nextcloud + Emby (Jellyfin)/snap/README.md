@@ -50,7 +50,7 @@ Este script realiza o backup e a restauração de sua instância Nextcloud, incl
  sudo sed -i 's/chown -R emby:emby/chown -R jellyfin:jellyfin/g' "/path/to/restore.sh"
  ````
  ````
- sudo sed -i 's/sudo adduser emby root/sudo adduser jellyfin root/g' "/path/to/Nextcloud + Emby (Jellyfin)/snap/restore.sh"
+ sudo sed -i 's/sudo adduser emby root/sudo adduser jellyfin root/g' "/path/to/restore.sh"
  ````
  ````
  sudo sed -i 's/emby-server.service/jellyfin.service/g' "/path/to/restore.sh"
