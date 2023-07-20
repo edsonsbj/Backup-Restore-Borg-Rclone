@@ -14,7 +14,6 @@ Este script realiza o backup e a restauração de sua instância Nextcloud, incl
   - Faça uma copia do arquivo `example.conf` e renomeie-o de acordo com suas necessidades.
   - Adicione as pastas que deseja fazer backup no arquivo `patterns.lst`. Por padrão, o arquivo já está pré-configurado para fazer backup das pastas do `Nextcloud`, incluindo a pasta de dados, excluindo a lixeira e também a pasta de configuração do `Emby`.
   - Defina as variáveis no arquivo `.conf` para corresponder às suas necessidades.
-  - Se você optou por usar o `Jellyfin` em vez do `Emby`, certifique-se de descomentar a linha referente ao `Jellyfin` e comentar as linhas referentes ao `Emby` no arquivo `patterns.lst`. Além disso, altere o valor da variável `EMBY_CONF` no arquivo `.conf` para corresponder ao caminho onde o `Jellyfin` armazena suas configurações.
   - Opcionalmente, mova os arquivos `backup.sh`, `patterns.lst`, `restore.sh` e o arquivo `.conf` recém-editado para uma pasta de sua preferência.
   - Torne os scripts executáveis usando o comando `sudo chmod +x`.
   - Substitua os valores `--config=/path/user/rclone.conf` e `Borg:`/ no arquivo `Backup.service` pelas configurações apropriadas, onde `--config` corresponde ao local do seu arquivo `rclone.conf` e `Borg:/` corresponde ao seu remoto (nuvem) a ser montado.
@@ -23,6 +22,37 @@ Este script realiza o backup e a restauração de sua instância Nextcloud, incl
 
  ````
  00 00 * * * sudo ./backup.sh
+ ````
+
+## **Jellyfin em vez do Emby**
+
+  - Se você optou por usar o `Jellyfin` em vez do `Emby`, execute os comandos abaixo
+
+ Comenta as linhas referente ao emby no arquivo `patterns.lst`.
+ ````
+ sudo sed -i '5,10s/^/# /g' "/path/to/patterns.lst"
+ ````
+ Descomenta a linha referente ao Jellyfin no arquivo `patterns.lst`.
+ ````
+ sudo sed -i '13s/^# //' "/path/to/patterns.lst"
+ ````
+ Altera a variável `EMBY_CONF` para corresponder a pasta de configurações do Jellyfin no arquivo ``example.conf`.
+ ````
+ sudo sed -i "s/\EMBY_CONF=\"\/var\/lib\/emby\"/\$EMBY_CONF=\"\/var\/lib\/jellyfin\"/g"  "/path/to/patterns.lst"
+ ````
+ Faça as alterações necessarias no script `backup.sh` e `restore.sh`.
+ 
+ ````
+ sudo sed -i 's/emby-server.service/jellyfin.service/g' "/path/to/backup.sh"
+ ````
+ ````
+ sudo sed -i 's/chown -R emby:emby/chown -R jellyfin:jellyfin/g' "/path/to/restore.sh"
+ ````
+ ````
+ sudo sed -i 's/sudo adduser emby root/sudo adduser jellyfin root/g' "/path/to/restore.sh"
+ ````
+ ````
+ sudo sed -i 's/emby-server.service/jellyfin.service/g' "/path/to/restore.sh"
  ````
 
 ## **Restauração**
