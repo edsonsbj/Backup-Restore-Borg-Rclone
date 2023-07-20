@@ -157,7 +157,7 @@ borg extract -v --list $BORG_REPO::$ARCHIVE_NAME $EMBY_CONF >> $RESTLOGFILE_PATH
 # Restaura as permissões
 
 chmod -R 755 $EMBY_CONF
-chown -R jellyfin:jellyfin $EMBY_CONF
+chown -R emby:emby $EMBY_CONF
 
 # Adicione o Usuário Emby ao grupo root para acessar as pastas do Nextcloud
 

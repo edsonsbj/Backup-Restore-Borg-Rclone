@@ -12,10 +12,8 @@ Este script realiza o backup e a restauração de sua instância Nextcloud, incl
 ## **Backup**
 
   - Faça uma copia do arquivo `example.conf` e renomeie-o de acordo com suas necessidades.
-  - Adicione as pastas que deseja fazer backup no arquivo `patterns.lst`. Por padrão, o arquivo já está pré-configurado para fazer backup das pastas do `Nextcloud`, incluindo a pasta de dados, excluindo a lixeira e também a pasta de configuração do `Emby`.
-  - Defina as variáveis no arquivo `.conf` para corresponder às suas necessidades.
-  - Se você optou por usar o `Jellyfin` em vez do `Emby`, certifique-se de descomentar a linha referente ao `Jellyfin` e comentar as linhas referentes ao `Emby` no arquivo `patterns.lst`. Além disso, altere o valor da variável `EMBY_CONF` no arquivo `.conf` para corresponder ao caminho onde o `Jellyfin` armazena suas configurações.
-  - Opcionalmente, mova os arquivos `backup.sh`, `patterns.lst`, `restore.sh` e o arquivo `.conf` recém-editado para uma pasta de sua preferência.
+  - Adicione as pastas que deseja fazer backup no arquivo `patterns.lst`. Por padrão, o arquivo já está pré-configurado para fazer backup das pastas do `Nextcloud`, incluindo a pasta de dados, excluindo a lixeira e também a pasta de configuração do `Emby (Jellyfin)`.
+  - Defina as variáveis no arquivo `.conf` para corresponder às suas necessidades.  - Opcionalmente, mova os arquivos `backup.sh`, `patterns.lst`, `restore.sh` e o arquivo `.conf` recém-editado para uma pasta de sua preferência.
   - Torne os scripts executáveis usando o comando `sudo chmod +x`.
   - Substitua os valores `--config=/path/user/rclone.conf` e `Borg:`/ no arquivo `Backup.service` pelas configurações apropriadas, onde `--config` corresponde ao local do seu arquivo `rclone.conf` e `Borg:/` corresponde ao seu remoto (nuvem) a ser montado.
   - Mova o `Backup.service` para a pasta `/etc/systemd/system/`.
@@ -25,7 +23,7 @@ Este script realiza o backup e a restauração de sua instância Nextcloud, incl
  00 00 * * * sudo ./backup.sh
  ````
 
-## **Jellyfin ao inves do Emby**
+## **Jellyfin em vez do Emby**
 
   - Se você optou por usar o `Jellyfin` em vez do `Emby`, execute os comandos abaixo
 
