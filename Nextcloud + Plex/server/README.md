@@ -31,13 +31,16 @@ Este script realiza o backup e a restauração de sua instância Nextcloud, incl
  Comenta as linhas referente ao emby no arquivo `patterns.lst`.
  ````
  sudo sed -i '5s/^/# /g' "/path/to/patterns.lst"
+ ````
+ ````
  sudo sed -i '20,23s/^/# /g' "/path/to/patterns.lst"
-  ````
+ ````
  Descomenta a linha referente ao Jellyfin no arquivo `patterns.lst`.
  ````
  sudo sed -i '8s/^# //' "/path/to/patterns.lst"
+ ````
+ ````
  sudo sed -i '26,29s/^# //' "/path/to/patterns.lst"
-
  ````
  Altera a variável `PLEX_CONF` para corresponder ao caminho do snap no arquivo `example.conf`.
  ````
