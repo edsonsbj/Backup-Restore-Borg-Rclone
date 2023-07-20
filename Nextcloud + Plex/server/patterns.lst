@@ -1,0 +1,32 @@
+P sh
+R /
+
+# DIRETÓRIOS PARA BACKUP PLEX MEDIA SERVER
++ /var/lib/plexmediaserver/Library/Application Support/Plex Media Server
+
+# DIRETÓRIOS PARA BACKUP PLEX MEDIA SERVER SNAP
+# + /var/snap/plexmediaserver/common/Library/Application Support/Plex Media Server/
+
+#DIRETÓRIO CONTENDO SUAS CONFIGURAÇÕES EXPORTADAS
++ /var/www/nextcloud
+
+# DIRETÓRIO DE DADOS. CASO TENHA MOVIDO SUA PASTA ./nextcloud/data PARA OUTRO LOCAL ALTERE O CAMINHO ABAIXO
++ /var/www/nextcloud/data
+
+# NÃO INCLUA A LIXEIRA. CASO TENHA MOVIDO SUA PASTA ./nextcloud/data PARA OUTRO LOCAL ALTERE O CAMINHO ABAIXO
+- /var/www/nextcloud/data/*/files_trashbin
+
+# NÃO INCLUA AS SEGUINTES PASTAS DO PLEX SNAP
+- /var/lib/plexmediaserver/Library/Application Support/Plex Media Server/Cache
+- /var/lib/plexmediaserver/Library/Application Support/Plex Media Server/Crash Reports
+- /var/lib/plexmediaserver/Library/Application Support/Plex Media Server/Diagnostics
+- /var/lib/plexmediaserver/Library/Application Support/Plex Media Server/Logs
+
+# NÃO INCLUA AS SEGUINTES PASTAS DO PLEX SNAP
+# - /var/snap/plexmediaserver/common/Library/Application Support/Plex Media Server/Cache
+# - /var/snap/plexmediaserver/common/Library/Application Support/Plex Media Server/Crash Reports
+# - /var/snap/plexmediaserver/common/Library/Application Support/Plex Media Server/Diagnostics
+# - /var/snap/plexmediaserver/common/Library/Application Support/Plex Media Server/Logs
+
+# Não Inclua mais nada
+- **
