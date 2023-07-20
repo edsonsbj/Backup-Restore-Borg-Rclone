@@ -57,14 +57,6 @@ else
     exit 1
 fi
 
-# Cria as pastas necessarias
-
-mkdir /mnt/rclone/Borg /var/log/Rclone /var/log/Borg
-
-# Monte o Rclone
-
-sudo systemctl start Backup.service
-
 # Verifica se a data de restauração foi especificada
 if [ -z "$ARCHIVE_DATE" ]
 then
@@ -85,17 +77,30 @@ fi
 # Função para mensagens de erro
 errorecho() { cat <<< "$@" 1>&2; } 
 
-# Ativando Modo de Manutenção
+# Cria as pastas necessarias
 
-echo
-sudo nextcloud.occ maintenance:mode --on >> $LOGFILE_PATH
-echo 
+mkdir /mnt/rclone/Borg /var/log/Rclone /var/log/Borg
 
-# Restaura as configurações do Nextcloud 
+# Monte o Rclone
+
+sudo systemctl start Backup.service
+
+# Restaura o backup do Nextcloud 
 # 
 echo "Restaurando backup das configurações do Nextcloud" >> $RESTLOGFILE_PATH
 
+# Ativando Modo de Manutenção
+
+echo
+sudo nextcloud.occ maintenance:mode --on >> $RESTLOGFILE_PATH
+echo 
+
+# Extraia os Arquivos
+
 borg extract -v --list $BORG_REPO::$ARCHIVE_NAME $NEXTCLOUD_CONF >> $RESTLOGFILE_PATH 2>&1
+
+echo
+echo "DONE!"
 
 # Verifique se o arquivo de backup existe
 if [ -z "RESTORE_FILE" ]; then
@@ -109,7 +114,7 @@ echo
 echo "DONE!"
 
 # Restaura a pasta ./data Nextcloud.
-# Útil se a pasta ./data estiver fora de /var/www/nextcloud caso contrario recomendo comentar a linha abaixo, pois seu servidor já estará restaurado com o comando acima. 
+# Útil se a pasta ./data estiver fora de /var/snap/nextcloud/common caso contrario recomendo comentar a linha abaixo, pois seu servidor já estará restaurado com o comando acima. 
 # 
 echo "Restaurando backup da pasta ./data" >> $RESTLOGFILE_PATH
 
@@ -124,6 +129,47 @@ chmod -R 770 $NEXTCLOUD_DATA
 chown -R root:root $NEXTCLOUD_DATA
 chown -R root:root $NEXTCLOUD_CONF
 
+# Desativando Modo de Manutenção Nextcloud
+
+echo  
+sudo nextcloud.occ maintenance:mode --off >> $RESTLOGFILE_PATH
+echo
+
+echo
+echo "DONE!"
+
+# Restaura as configurações do Emby 
+
+echo "Restaurando backup Emby" >> $RESTLOGFILE_PATH
+
+# Pare o Emby
+
+sudo systemctl stop emby-server.service
+
+# Remova a Pasta atual do Emby
+
+rm -rf $EMBY_CONF
+
+# Extraia os arquivos
+
+borg extract -v --list $BORG_REPO::$ARCHIVE_NAME $EMBY_CONF >> $RESTLOGFILE_PATH 2>&1
+
+# Restaura as permissões
+
+chmod -R 755 $EMBY_CONF
+chown -R jellyfin:jellyfin $EMBY_CONF
+
+# Adicione o Usuário Emby ao grupo root para acessar as pastas do Nextcloud
+
+sudo adduser emby root
+
+# Inicie o Emby
+
+sudo systemctl start emby-server.service
+
+echo
+echo "DONE!"
+
 # Para sistemas de arquivos NTFS e FAT32 entre outros que não aceitam permissões convêm adicionar uma entrada em seu arquivo /etc/fstab para isso descomente a linha abaixo e altere o UUID /mnt/SEUHD e o campo ntfs-3g.
 # Para encontrar o UUID de sua partição ou HD execute o comando sudo blkid. 
 
@@ -131,15 +177,6 @@ chown -R root:root $NEXTCLOUD_CONF
 #sudo cat <<EOF >>/etc/fstab
 #UUID=089342544239044F /mnt/SEUHD ntfs-3g utf8,uid=www-data,gid=www-data,umask=0007,noatime,x-gvfs-show 0 0
 #EOF
-
-echo
-echo "DONE!"
-
-# Desativando Modo de Manutenção Nextcloud
-
-echo
-sudo nextcloud.occ maintenance:mode --off >> $LOGFILE_PATH
-echo
 
 echo
 echo "DONE!"

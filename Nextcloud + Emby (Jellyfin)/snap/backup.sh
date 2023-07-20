@@ -32,6 +32,10 @@ sudo nextcloud.export -abc >> $LOGFILE_PATH
 
 sudo tar -cvf $BACKUP_FILE $NEXTCLOUD_CONF
 
+# Pare o Emby
+
+sudo systemctl stop emby-server.service
+
 # Ativando Modo de Manutenção
 
 echo
@@ -77,8 +81,12 @@ prune_exit=$?
 # Desativando Modo de Manutenção Nextcloud
 
 echo  
-sudo nextcloud.occ maintenance:mode --off >> $LOGFILE_PATH
+sudo nextcloudocc maintenance:mode --off >> $LOGFILE_PATH
 echo
+
+# Inicie o Emby
+
+sudo systemctl start emby-server.service
 
 rm -rf $NEXTCLOUD_CONF/
 
