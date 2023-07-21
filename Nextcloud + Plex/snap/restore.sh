@@ -17,7 +17,7 @@ then
 fi
 
 #
-# DESCOMENTE AS LINHAS ABAIXO CASO DESEJE RESTAURAR O DIRETÓRIO ./nextcloud/data EM UM HD EXTERNO.   
+# Descomente as linhas a seguir se for preciso efetuar a restauração de arquivos ou pastas de armazenamento externo como pendrives e HD's Externos
 
 # NÃO ALTERE
 # MOUNT_FILE="/proc/mounts"
@@ -57,32 +57,77 @@ else
     exit 1
 fi
 
+# Verifica se a data de restauração foi especificada
+if [ -z "$ARCHIVE_DATE" ]
+then
+    echo "Por favor, especifique a data de restauração."
+    exit 1
+fi
+
+# Encontra o nome do arquivo de backup correspondente à data especificada
+ARCHIVE_NAME=$(borg list $BORG_REPO | grep $ARCHIVE_DATE | awk '{print $1}')
+
+# Verifica se o arquivo de backup foi encontrado
+if [ -z "$ARCHIVE_NAME" ]
+then
+    echo "Não foi possível encontrar um arquivo de backup para a data especificada: $ARCHIVE_DATE"
+    exit 1
+fi
+
 # Função para mensagens de erro
 errorecho() { cat <<< "$@" 1>&2; } 
 
-#gpg Descript
+# Cria as pastas necessarias
 
-/usr/bin/gpg --batch --no-tty --homedir $DIRGPG --passphrase-file $PASSFILE $RCLONECONFIG_CRIPT >> $RESTLOGFILE_PATH 2>&1
+mkdir /mnt/rclone/Borg /var/log/Rclone /var/log/Borg
 
 # Monte o Rclone
 
 sudo systemctl start Backup.service
 
-# Pare o Plex
-
-sudo snap stop plexmediaserver
+# Restaura o backup do Nextcloud 
+# 
+echo "Restaurando backup das configurações do Nextcloud" >> $RESTLOGFILE_PATH
 
 # Ativando Modo de Manutenção
 
 echo
 sudo nextcloud.occ maintenance:mode --on >> $RESTLOGFILE_PATH
+echo 
+
+# Extraia os Arquivos
+
+borg extract -v --list $BORG_REPO::$ARCHIVE_NAME $NEXTCLOUD_CONF >> $RESTLOGFILE_PATH 2>&1
+
 echo
+echo "DONE!"
 
-# Extraia os arquivos 
+# Verifique se o arquivo de backup existe
+if [ -z "RESTORE_FILE" ]; then
+    echo "Nenhum arquivo de backup encontrado"
+    exit 1
+fi
+
+sudo nextcloud.import -abc $RESTORE_FILE >> $RESTLOGFILE_PATH
+
+echo
+echo "DONE!"
+
+# Restaura a pasta ./data Nextcloud.
+# Útil se a pasta ./data estiver fora de /var/snap/nextcloud/common caso contrario recomendo comentar a linha abaixo, pois seu servidor já estará restaurado com o comando acima. 
 # 
-echo "Restaurando Arquivos " $RESTLOGFILE_PATH
+echo "Restaurando backup da pasta ./data" >> $RESTLOGFILE_PATH
 
-borg extract -v --list "$BORG_REPO::$(hostname)-$DATARESTORE" --patterns-from $PATTERNS >> $RESTLOGFILE_PATH 2>&1
+borg extract -v --list $BORG_REPO::$ARCHIVE_NAME $NEXTCLOUD_DATA >> $RESTLOGFILE_PATH 2>&1
+
+echo
+echo "DONE!"
+
+# Restaura as permissões 
+
+chmod -R 770 $NEXTCLOUD_DATA 
+chown -R root:root $NEXTCLOUD_DATA
+chown -R root:root $NEXTCLOUD_CONF
 
 # Desativando Modo de Manutenção Nextcloud
 
@@ -90,22 +135,66 @@ echo
 sudo nextcloud.occ maintenance:mode --off >> $RESTLOGFILE_PATH
 echo
 
-# Restaurando Configurações Nextcloud 
+echo
+echo "DONE!"
 
-sudo nextcloud.import -abc $NEXTCLOUD_CONFIG >> $RESTLOGFILE_PATH
+# Restaura as configurações do PLEX 
 
-# Inicie o Plex
+echo "Restaurando backup PLEX" >> $RESTLOGFILE_PATH
 
-sudo snap start plexmediaserver 
+# Pare o PLEX
 
-# Desmonte o Rclone
+sudo systemctl stop plexmediaserver
 
-sudo systemctl stop Backup.service
+# Pare o PLEX (snap)
 
-# Por Segurança remova o rclone.conf
+#sudo snap stop plexmediaserver
 
-rm -rf $RCLONECONFIG
+# Remova a Pasta atual do PLEX
+
+rm -rf $PLEX_CONF
+
+# Extraia os arquivos
+
+borg extract -v --list $BORG_REPO::$ARCHIVE_NAME $PLEX_CONF >> $RESTLOGFILE_PATH 2>&1
+
+# Restaura as permissões
+
+chmod -R 755 $PLEX_CONF
+chown -R plex:plex $PLEX_CONF
+
+# Restaura as permissões (snap)
+
+#chmod -R 755 $PLEX_CONF
+#chown -R root:root $PLEX_CONF
+
+# Adicione o Usuário PLEX ao grupo root para acessar as pastas do Nextcloud
+
+sudo adduser plex root
+
+# Adicione o Usuário Emby ao grupo www-data para acessar as pastas do Nextcloud (snap)
+
+#sudo adduser root www-data
+
+# Inicie o PLEX
+
+sudo systemctl start plexmediaserver
+
+# Inicia o Plex (snap)
+
+#sudo snap start plexmediaserver
 
 echo
 echo "DONE!"
-echo "$(date "+%m-%d-%Y %T") : Restauração Concluida com Sucesso." 2>&1 | tee -a $RESTLOGFILE_PATH
+
+# Para sistemas de arquivos NTFS e FAT32 entre outros que não aceitam permissões convêm adicionar uma entrada em seu arquivo /etc/fstab para isso descomente a linha abaixo e altere o UUID /mnt/SEUHD e o campo ntfs-3g.
+# Para encontrar o UUID de sua partição ou HD execute o comando sudo blkid. 
+
+#cp /etc/fstab /etc/fstab.bk
+#sudo cat <<EOF >>/etc/fstab
+#UUID=089342544239044F /mnt/SEUHD ntfs-3g utf8,uid=root,gid=root,umask=0007,noatime,x-gvfs-show 0 0
+#EOF
+
+echo
+echo "DONE!"
+echo "$(date "+%m-%d-%Y %T") : Successfully restored." 2>&1 | tee -a $RESTLOGFILE_PATH

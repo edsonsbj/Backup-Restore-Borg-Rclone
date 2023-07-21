@@ -18,9 +18,9 @@ fi
 
 info "Backup Iniciado" 2>&1 | tee -a $LOGFILE_PATH
 
-# Cria as Pastas Necessarias
+#gpg Descript
 
-mkdir /mnt/rclone /var/log/Rclone /var/log/Borg
+/usr/bin/gpg --batch --no-tty --homedir $DIRGPG --passphrase-file $PASSFILE $RCLONECONFIG_CRIPT >> $LOGFILE_PATH 2>&1
 
 # Monte o Rclone
 
@@ -29,12 +29,6 @@ sudo systemctl start Backup.service
 # Exporte as Configurações do Nextcloud
 
 sudo nextcloud.export -abc >> $LOGFILE_PATH
-
-sudo tar -cvf $BACKUP_FILE $NEXTCLOUD_CONF
-
-# Pare o Plex
-
-sudo systemctl stop plexmediaserver
 
 # Ativando Modo de Manutenção
 
@@ -84,11 +78,12 @@ echo
 sudo nextcloud.occ maintenance:mode --off >> $LOGFILE_PATH
 echo
 
-# Inicie o Plex
+# Desmonte o Rclone
 
-sudo systemctl start plexmediaserver
+sudo systemctl stop Backup.service
 
-rm -rf $NEXTCLOUD_CONF/
+# Por Seguranção remova o rclone.conf 
+rm -rf $RCLONECONFIG 
 
 # usa o código de saída mais alto como código de saída global
 global_exit=$(( backup_exit > prune_exit ? backup_exit : prune_exit ))

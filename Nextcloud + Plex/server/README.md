@@ -1,6 +1,6 @@
 # Nextcloud server + PLEX
 
-Este repositório contém um script que realiza o backup e a restauração de sua instância Nextcloud, incluindo a pasta de dados, bem como as configurações do servidor PLEX. O backup é feito usando o Borg Backup e a montagem Rclone para armazenar seus backups em um serviço de nuvem de sua escolha.
+Este diretório contém um script que realiza o backup e a restauração de sua instância Nextcloud, incluindo a pasta de dados, bem como as configurações do servidor PLEX. O backup é feito usando o Borg Backup e a montagem Rclone para armazenar seus backups em um serviço de nuvem de sua escolha.
 
 ## Início
 
@@ -28,12 +28,12 @@ Este repositório contém um script que realiza o backup e a restauração de su
 
 Se o PLEX tiver sido instalado por meio do comando `snap install plexmediaserver`, siga os passos abaixo:
 
-1. Comente as linhas referentes ao Emby no arquivo `patterns.lst`.
+1. Comente as linhas referentes ao PLEX no arquivo `patterns.lst`.
 ```
 sudo sed -i '5s/^/# /g' "/path/to/patterns.lst"
 sudo sed -i '20,23s/^/# /g' "/path/to/patterns.lst"
 ```
-2. Descomente a linha referente ao Jellyfin no arquivo `patterns.lst`.
+2. Descomente as linhas referente ao snap no arquivo `patterns.lst`.
 ```
 sudo sed -i '8s/^# //' "/path/to/patterns.lst"
 sudo sed -i '26,29s/^# //' "/path/to/patterns.lst"
@@ -141,13 +141,11 @@ echo "DONE!"
 ./restore.sh 2023-07-15
 ```
 
-### Restaure o PLEX
+### **Restaure o PLEX**
 
 Para restaurar somente as configurações do PLEX, siga as instruções abaixo.
 
-- Em seu arquivo
-
- `restore.sh`, comente o intervalo de linhas abaixo.
+- Em seu arquivo `restore.sh` comente o intervalo de linhas abaixo.
 
 ```
 # Restaura o backup do Nextcloud
