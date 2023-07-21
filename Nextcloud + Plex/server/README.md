@@ -5,14 +5,14 @@ Este diretório contém um script que realiza o backup e a restauração de sua 
 ## Início
 
 - Certifique-se de que o `Nextcloud` já está instalado e funcionando corretamente.
-- Verifique se o `Emby` ou `Jellyfin` já está instalado em seu sistema.
+- Verifique se o `PLEX` já está instalado em seu sistema.
 - Verifique se os programas `rclone`, `borg` e `git` já estão instalados em seu sistema.
 - Clone este repositório usando o comando `git clone https://github.com/edsonsbj/Backup-Restore-Borg-Rclone.git`.
 
 ## Backup
 
 1. Faça uma cópia do arquivo `example.conf` e renomeie-o de acordo com suas necessidades.
-2. Adicione as pastas que deseja fazer backup no arquivo `patterns.lst`. Por padrão, o arquivo já está pré-configurado para fazer backup das pastas do `Nextcloud`, incluindo a pasta de dados, excluindo a lixeira e também a pasta de configuração do `Emby`.
+2. Adicione as pastas que deseja fazer backup no arquivo `patterns.lst`. Por padrão, o arquivo já está pré-configurado para fazer backup das pastas do `Nextcloud`, incluindo a pasta de dados, excluindo a lixeira e também a pasta de configuração do `PLEX`.
 3. Defina as variáveis no arquivo `.conf` para corresponder às suas necessidades.
 4. Opcionalmente, mova os arquivos `backup.sh`, `patterns.lst`, `restore.sh` e o arquivo `.conf` recém-editado para uma pasta de sua preferência.
 5. Torne os scripts executáveis usando o comando `sudo chmod +x`.
@@ -26,7 +26,7 @@ Este diretório contém um script que realiza o backup e a restauração de sua 
 
 ## Instalação do PLEX por meio de pacotes Snap
 
-Se o PLEX tiver sido instalado por meio do comando `snap install plexmediaserver`, siga os passos abaixo:
+Se o PLEX foi instalado usando o comando `snap install plexmediaserver`, siga os passos abaixo:
 
 1. Comente as linhas referentes ao PLEX no arquivo `patterns.lst`.
 ```
@@ -47,7 +47,6 @@ sudo sed -i "s/PLEX_CONF=\"\/var\/lib\/plexmediaserver\/Library\/Application Sup
 sudo sed -i 's/systemctl start plexmediaserver/snap start plexmediaserver/g' "/path/to/backup.sh"
 sudo sed -i 's/systemctl stop plexmediaserver/snap stop plexmediaserver/g' "/path/to/backup.sh"
 sudo sed -i 's/chown -R plex:plex/chown -R root:root/g' "/path/to/restore.sh"
-sudo sed -i 's/sudo adduser plex www-data/sudo adduser root www-data/g' "/path/to/restore.sh"
 sudo sed -i 's/systemctl start plexmediaserver/snap start plexmediaserver/g' "/path/to/restore.sh"
 sudo sed -i 's/systemctl stop plexmediaserver/snap stop plexmediaserver/g' "/path/to/restore.sh"
 ```

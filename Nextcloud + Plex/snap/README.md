@@ -5,7 +5,7 @@ Este diretório contém um script que realiza o backup e a restauração de sua 
 ## Início
 
 - Certifique-se de que o `Nextcloud` já está instalado e funcionando corretamente.
-- Verifique se o `Emby` ou `Jellyfin` já está instalado em seu sistema.
+- Verifique se o `PLEX` já está instalado em seu sistema.
 - Verifique se os programas `rclone`, `borg` e `git` já estão instalados em seu sistema.
 - Clone este repositório usando o comando `git clone https://github.com/edsonsbj/Backup-Restore-Borg-Rclone.git`.
 
