@@ -40,7 +40,7 @@ sudo sed -i '13s/^# //' "/path/to/patterns.lst"
 ````
 sudo sed -i "s/\EMBY_CONF=\"\/var\/lib\/emby\"/\$EMBY_CONF=\"\/var\/lib\/jellyfin\"/g" "/path/to/patterns.lst"
 ````
-Faça as alterações necessarias no script `backup.sh` e `restore.sh`.
+4. Faça as alterações necessarias no script `backup.sh` e `restore.sh`.
 ````
 sudo sed -i 's/emby-server.service/jellyfin.service/g' "/path/to/backup.sh"
 sudo sed -i 's/chown -R emby:emby/chown -R jellyfin:jellyfin/g' "/path/to/restore.sh"
