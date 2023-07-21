@@ -44,7 +44,7 @@ Este script realiza o backup e a restauração de sua instância Nextcloud, incl
  ````
  Altera a variável `PLEX_CONF` para corresponder ao caminho do snap no arquivo `example.conf`.
  ````
- sudo sed -i "s/PLEX_CONF="/var/lib/plexmediaserver/Library/Application Support/Plex Media Server"/PLEX_CONF="/var/lib/plexmediaserver/Library/Application Support/Plex Media Server"/g"  "/path/to/patterns.lst"
+ sudo sed -i "s/PLEX_CONF=\"\/var\/lib\/plexmediaserver\/Library\/Application Support\/Plex Media Server\"/PLEX_CONF=\"\/var\/snap\/plexmediaserver\/Library\/Application Support\/Plex Media Server\"/g" "/path/to/patterns.lst"
  ````
  Faça as alterações necessarias no script `backup.sh` e `restore.sh`.
  
@@ -148,7 +148,6 @@ Para restaurar somente a pasta ./data, siga as instruções abaixo.
  echo
  echo "DONE!"
  ```
-  - Não esqueça de seguir as instruções descritas na na seção "Restaure o Nextcloud" caso precise restaurar somente a pasta `/data`. 
   - Execute o script com a data desejada do backup a ser restaurado.
 
    ```
