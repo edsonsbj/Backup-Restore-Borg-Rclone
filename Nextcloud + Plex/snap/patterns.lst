@@ -1,32 +1,39 @@
 P sh
 R /
 
-# DIRETÓRIOS PARA BACKUP PLEX MEDIA SERVER
-+ /var/lib/plexmediaserver/Library/Application Support/Plex Media Server
+# NÃO OLHE NESTAS PASTAS
+! proc
 
-# DIRETÓRIOS PARA BACKUP PLEX MEDIA SERVER SNAP
-# + /var/snap/plexmediaserver/common/Library/Application Support/Plex Media Server/
+# DIRETÓRIOS A SEREM EXCLUIDOS DO BACKUP  
 
-# DIRETÓRIO CONTENDO SUAS CONFIGURAÇÕES EXPORTADAS
-+ /var/snap/nextcloud/common/backups/*.tar.gz
-
-# DIRETÓRIO DE DADOS. CASO TENHA MOVIDO SUA PASTA ./nextcloud/data PARA OUTRO LOCAL ALTERE O CAMINHO ABAIXO
-+ /var/snap/nextcloud/common/nextcloud/data
-
-# NÃO INCLUA A LIXEIRA. CASO TENHA MOVIDO SUA PASTA ./nextcloud/data PARA OUTRO LOCAL ALTERE O CAMINHO ABAIXO
-- /var/snap/nextcloud/common/nextcloud/data/*/files_trashbin
-
-# NÃO INCLUA AS SEGUINTES PASTAS DO PLEX SNAP
+# PLEX (.DEB)
 - /var/lib/plexmediaserver/Library/Application Support/Plex Media Server/Cache
 - /var/lib/plexmediaserver/Library/Application Support/Plex Media Server/Crash Reports
 - /var/lib/plexmediaserver/Library/Application Support/Plex Media Server/Diagnostics
 - /var/lib/plexmediaserver/Library/Application Support/Plex Media Server/Logs
 
-# NÃO INCLUA AS SEGUINTES PASTAS DO PLEX SNAP
+# PLEX (SNAP)
 # - /var/snap/plexmediaserver/common/Library/Application Support/Plex Media Server/Cache
 # - /var/snap/plexmediaserver/common/Library/Application Support/Plex Media Server/Crash Reports
 # - /var/snap/plexmediaserver/common/Library/Application Support/Plex Media Server/Diagnostics
 # - /var/snap/plexmediaserver/common/Library/Application Support/Plex Media Server/Logs
 
-# Não Inclua mais nada
+# NEXTCLOUD
+- /var/snap/nextcloud/common/nextcloud/data/*/files_trashbin
+
+# DIRETÓRIOS PARA BACKUP 
+
+# PLEX (.DEB)
++ /var/lib/plexmediaserver/Library/Application Support/Plex Media Server
+
+# PLEX (SNAP)
+# + /var/snap/plexmediaserver/common/Library/Application Support/Plex Media Server/
+
+# NEXTCLOUD - CONFIGURAÇÕES
++ /var/snap/nextcloud/common/backups/*.tar.gz
+
+# DIRETÓRIO DE DADOS. CASO TENHA MOVIDO SUA PASTA ./nextcloud/data PARA OUTRO LOCAL ALTERE O CAMINHO ABAIXO
++ /var/snap/nextcloud/common/nextcloud/data
+
+# NÃO INCLUIR MAIS NENHUM ARQUIVO
 - **
