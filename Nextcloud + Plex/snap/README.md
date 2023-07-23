@@ -80,7 +80,7 @@ echo "Restaurando backup Plex" >> $RESTLOGFILE_PATH
 
 sudo systemctl stop plexmediaserver
 
-# Mova a pasta atual do Emby
+# Mova a pasta atual do Plex
 rm -rf $PLEX_CONF
 
 borg extract -v --list $BORG_REPO::$ARCHIVE_NAME $PLEX_CONF >> $RESTLOGFILE_PATH 2>&1
@@ -90,7 +90,7 @@ borg extract -v --list $BORG_REPO::$ARCHIVE_NAME $PLEX_CONF >> $RESTLOGFILE_PATH
 chmod -R 755 $PLEX_CONF
 chown -R plex:plex $PLEX_CONF
 
-# Adicione o Usuário Emby ao grupo www-data para acessar as pastas do Nextcloud
+# Adicione o Usuário Plex ao grupo www-data para acessar as pastas do Nextcloud
 
 sudo adduser plex root
 

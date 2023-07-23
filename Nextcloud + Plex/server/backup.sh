@@ -82,9 +82,9 @@ echo
 sudo -u www-data php $NEXTCLOUD_CONF/occ maintenance:mode --off >> $LOGFILE_PATH
 echo
 
-# Inicie o Emby
+# Inicie o Plex
 
-sudo systemctl start emby-server.service
+sudo systemctl start plexmediaserver
 
 # usa o código de saída mais alto como código de saída global
 global_exit=$(( backup_exit > prune_exit ? backup_exit : prune_exit ))

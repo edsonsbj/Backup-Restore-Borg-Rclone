@@ -87,10 +87,10 @@ borg extract -v --list $BORG_REPO::$ARCHIVE_NAME $PLEX_CONF >> $RESTLOGFILE_PATH
 
 # Restaura as permissões
 
-chmod -R 755 $EMBY_CONF
-chown -R plex:plex $EMBY_CONF
+chmod -R 755 PLEX_CONF
+chown -R plex:plex PLEX_CONF
 
-# Adicione o Usuário Emby ao grupo www-data para acessar as pastas do Nextcloud
+# Adicione o Usuário PLEX ao grupo www-data para acessar as pastas do Nextcloud
 
 sudo adduser plex www-data
 

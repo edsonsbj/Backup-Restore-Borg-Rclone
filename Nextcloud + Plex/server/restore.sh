@@ -161,7 +161,7 @@ sudo systemctl stop plexmediaserver
 
 #sudo snap stop plexmediaserver
 
-# Remova a Pasta atual do Emby
+# Remova a Pasta atual do Plex
 
 rm -rf $PLEX_CONF
 
@@ -179,11 +179,11 @@ chown -R plex:plex $PLEX_CONF
 #chmod -R 755 $PLEX_CONF
 #chown -R root:root $PLEX_CONF
 
-# Adicione o Usuário Emby ao grupo www-data para acessar as pastas do Nextcloud
+# Adicione o Usuário Plex ao grupo www-data para acessar as pastas do Nextcloud
 
 sudo adduser plex www-data
 
-# Adicione o Usuário Emby ao grupo www-data para acessar as pastas do Nextcloud (snap)
+# Adicione o Usuário Plex ao grupo www-data para acessar as pastas do Nextcloud (snap)
 
 #sudo adduser root www-data
 

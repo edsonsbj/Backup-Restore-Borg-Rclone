@@ -172,7 +172,7 @@ chown -R plex:plex $PLEX_CONF
 
 sudo adduser plex root
 
-# Adicione o Usuário Emby ao grupo www-data para acessar as pastas do Nextcloud (snap)
+# Adicione o Usuário Plex ao grupo www-data para acessar as pastas do Nextcloud (snap)
 
 #sudo adduser root www-data
 
