@@ -1,88 +1,89 @@
-# Scripts de Backup e Restauração usando Borg Backup e Rclone
+# Backup and Restoration Scripts using Borg Backup and Rclone
 
-Este repositório contém scripts para realização de backup e restauração utilizando as ferramentas Borg e Rclone. O Rclone é usado para montar um serviço de nuvem de sua preferência em uma unidade local, permitindo a realização de backups e restaurações. 
+This repository contains scripts for performing backup and restoration tasks using the Borg and Rclone tools. Rclone is utilized to mount a cloud service of your preference onto a local drive, enabling backup and restoration operations.
 
-## Início
+## Getting Started
 
-- Verifique se os programas `rclone`, `borg` e `git` já estão instalados em seu sistema.
-- Clone este repositório usando o comando `git clone https://github.com/edsonsbj/Backup-Restore-Borg-Rclone.git`.
-
+- Ensure that the `rclone`, `borg`, and `git` programs are already installed on your system.
+- Clone this repository using the command `git clone https://github.com/edsonsbj/Backup-Restore-Borg-Rclone.git`.
 
 ## Backup
 
-1. Faça uma cópia do arquivo `example.conf` e renomeie-o de acordo com suas necessidades.
-2. Adicione as pastas que deseja fazer backup no arquivo `patterns.lst`.
-3. Defina as variáveis no arquivo `.conf` para corresponder às suas necessidades.
-4. Opcionalmente, mova os arquivos `backup.sh`, `patterns.lst`, `restore.sh` e o arquivo `.conf` recém-editado para uma pasta de sua preferência.
-5. Torne os scripts executáveis usando o comando `sudo chmod +x`.
-6. Substitua os valores `--config=/path/user/rclone.conf` e `Borg:`/ no arquivo `Backup.service` pelas configurações apropriadas, onde `--config` corresponde ao local do seu arquivo `rclone.conf` e `Borg:/` corresponde ao seu remoto (nuvem) a ser montado.
-7. Mova o `Backup.service` para a pasta `/etc/systemd/system/`.
-8. Execute o script `./backup.sh` ou crie um novo trabalho no Cron usando o comando `crontab -e`, conforme exemplo abaixo:
+1. Make a copy of the `example.conf` file and rename it according to your needs.
+2. Add the folders you wish to back up to the `patterns.lst` file.
+3. Set the variables in the `.conf` file to match your requirements.
+4. Optionally, move the `backup.sh`, `patterns.lst`, `restore.sh`, and the newly edited `.conf` file to a folder of your preference.
+5. Make the scripts executable using the command `sudo chmod +x`.
+6. Replace the values `--config=/path/user/rclone.conf` and `Borg:` in the `Backup.service` file with appropriate settings, where `--config` corresponds to the location of your `rclone.conf` file, and `Borg:/` corresponds to your remote (cloud) to be mounted.
+7. Move the `Backup.service` to the `/etc/systemd/system/` folder.
+8. Execute the script `./backup.sh` or create a new Cron job using the command `crontab -e`, following the example below:
 
 ```
 00 00 * * * sudo ./backup.sh
 ```
 
-## Restauração
+## Restoration
 
-Restaura todos os arquivos.
+Restore all files.
 
-- Execute o script com a data desejada do backup a ser restaurado juntamente com o arquivo ou diretorio que gostaria de restaurar.
+- Execute the script with the desired backup date to be restored along with the file or directory you want to restore.
 
 ```
 ./restore.sh 2023-07-15 home/
 ```
 
-### Restaure os dados em mídia removível
+### Restore data on removable media
 
-- Altere as variáveis `DEVICE` e `MOUNTDIR` `NEXTCLOUD_DATA` em seu arquivo `.conf`.
-- Em seu arquivo `restore.sh`, descomente as linhas a seguir.
+- Change the variables `DEVICE` and `MOUNTDIR` `NEXTCLOUD_DATA` in your `.conf` file.
+- In your `restore.sh` file, uncomment the following lines:
 
 ```
-# NÃO ALTERE
+# DO NOT MODIFY
 # MOUNT_FILE="/proc/mounts"
 # NULL_DEVICE="1> /dev/null 2>&1"
 # REDIRECT_LOG_FILE="1>> $LOGFILE_PATH 2>&1"
 
-# O dispositivo está montado?
+# Is the device mounted?
 # grep -q "$DEVICE" "$MOUNT_FILE"
 # if [ "$?" != "0" ]; then
-# Se não, monte em $MOUNTDIR
-#  echo " Dispositivo não montado. Montando $DEVICE " >> $LOGFILE_PATH
+# If not, mount to $MOUNTDIR
+#  echo " Device not mounted. Mounting $DEVICE " >> $LOGFILE_PATH
 #  eval mount -t auto "$DEVICE" "$MOUNTDIR" "$NULL_DEVICE"
 #else
-# Se sim, grep o ponto de montagem e altere o $MOUNTDIR
+# If yes, grep the mount point and change $MOUNTDIR
 #  DESTINATIONDIR=$(grep "$DEVICE" "$MOUNT_FILE" | cut -d " " -f 2)
 #fi
 
-# Há permissões de escrita e gravação?
+# Are there write and read permissions?
 # [ ! -w "$MOUNTDIR" ] && {
-#  echo " Não tem permissões de gravação " >> $LOGFILE_PATH
+#  echo " Does not have write permissions " >> $LOGFILE_PATH
 #  exit 1
 #}
 ```
 
-## Algumas observações importantes
+## Some important notes
 
-- É altamente recomendável desmontar a unidade local onde foi efetuado o backup após a conclusão do processo. Para isso, crie um agendamento no Cron para desmontar a unidade em um intervalo de 3 horas após o início do backup. Por exemplo:
+- It is highly recommended to unmount the local drive where the backup was made after the process is completed. To do this, schedule a Cron job to unmount the drive within 3 hours of starting the backup. For example:
 
 ```
 00 00 * * * sudo ./backup.sh
 00 03 * * * sudo systemctl stop backup.service
 ```
 
-Isso garantirá que o Rclone tenha tempo suficiente para completar o upload dos arquivos para a nuvem antes de desmontar a unidade.
+This will ensure that Rclone has enough time to complete the file upload to the cloud before unmounting the drive.
 
-## Testes
+## Testing
 
-Em testes realizados, o tempo decorrido para o backup e restauração foi semelhante ao de outras ferramentas como `Duplicity` ou `Deja-Dup`.
+In tests conducted, the elapsed time for backup and restoration was similar to other tools such as `Duplicity` or `Deja-Dup`.
 
 # Nextcloud
-Neste diretório, você encontrará dois scripts para realizar o backup e a restauração do Nextcloud, dependendo do tipo de instalação que você fez: manual (Apache + MySQL + PHP) ou por meio de pacotes snap.
+
+In this directory, you will find two scripts for performing backup and restoration of Nextcloud, depending on the type of installation you have: manual (Apache + MySQL + PHP) or via snap packages.
 
 # Nextcloud + Plex
-Use este script se você tiver um servidor Nextcloud e Plex na mesma máquina. Dentro da pasta, há duas opções de script, uma para cada tipo de instalação do Nextcloud.
+
+Use this script if you have a Nextcloud server and Plex on the same machine. Inside the folder, there are two script options, one for each type of Nextcloud installation.
 
 # Nextcloud + Emby (Jellyfin)
-Use este script se você tiver um servidor Nextcloud e Emby na mesma máquina. Dentro da pasta, há duas opções de script, uma para cada tipo de instalação do Nextcloud. Além disso, é possível alterar o script caso você utilize o Jellyfin em vez do Emby.
 
+Use this script if you have a Nextcloud server and Emby on the same machine. Inside the folder, there are two script options, one for each type of Nextcloud installation. Additionally, you can modify the script if you use Jellyfin instead of Emby.
