@@ -1,128 +1,128 @@
 # Nextcloud server
 
-Este diretório contém um script que realiza o backup e a restauração de sua instância Nextcloud, incluindo a pasta de dados. O backup é feito usando o Borg Backup e a montagem Rclone para armazenar seus backups em um serviço de nuvem de sua escolha.
+This directory contains a script that performs the backup and restoration of your Nextcloud instance, including the data folder. The backup is done using Borg Backup and Rclone mount to store your backups in a cloud service of your choice.
 
-## Início
+## Start
 
-- Certifique-se de que o `Nextcloud` já está instalado e funcionando corretamente.
-- Verifique se os programas `rclone`, `borg` e `git` já estão instalados em seu sistema.
-- Clone este repositório usando o comando `git clone https://github.com/edsonsbj/Backup-Restore-Borg-Rclone.git`.
+- Make sure that `Nextcloud` is already installed and working properly.
+- Check if the programs `rclone`, `borg` and `git` are already installed on your system.
+- Clone this repository using the command `git clone https://github.com/edsonsbj/Backup-Restore-Borg-Rclone.git`.
 
 ## Backup
 
-1. Faça uma cópia do arquivo `example.conf` e renomeie-o de acordo com suas necessidades.
-2. Adicione as pastas que deseja fazer backup no arquivo `patterns.lst`. Por padrão, o arquivo já está pré-configurado para fazer backup das pastas do `Nextcloud`, incluindo a pasta de dados, excluindo a lixeira.
-3. Defina as variáveis no arquivo `.conf` para corresponder às suas necessidades.
-4. Opcionalmente, mova os arquivos `backup.sh`, `patterns.lst`, `restore.sh` e o arquivo `.conf` recém-editado para uma pasta de sua preferência.
-5. Torne os scripts executáveis usando o comando `sudo chmod +x`.
-6. Substitua os valores `--config=/path/user/rclone.conf` e `Borg:`/ no arquivo `Backup.service` pelas configurações apropriadas, onde `--config` corresponde ao local do seu arquivo `rclone.conf` e `Borg:/` corresponde ao seu remoto (nuvem) a ser montado.
-7. Mova o `Backup.service` para a pasta `/etc/systemd/system/`.
-8. Execute o script `./backup.sh` ou crie um novo trabalho no Cron usando o comando `crontab -e`, conforme exemplo abaixo:
+1. Make a copy of the file `example.conf` and rename it according to your needs.
+2. Add the folders you want to backup in the file `patterns.lst`. By default, the file is already pre-configured to backup the `Nextcloud` folders, including the data folder, excluding the trash bin.
+3. Set the variables in the `.conf` file to match your needs.
+4. Optionally, move the files `backup.sh`, `patterns.lst`, `restore.sh` and the newly edited `.conf` file to a folder of your preference.
+5. Make the scripts executable using the command `sudo chmod +x`.
+6. Replace the values `--config=/path/user/rclone.conf` and `Borg:`/ in the file `Backup.service` with the appropriate settings, where `--config` corresponds to the location of your `rclone.conf` file and `Borg:/` corresponds to your remote (cloud) to be mounted.
+7. Move the `Backup.service` to the folder `/etc/systemd/system/`.
+8. Run the script `./backup.sh` or create a new job in Cron using the command `crontab -e`, as shown below:
 
 ```
 00 00 * * * sudo ./backup.sh
 ```
 
-## Restauração
+## Restoration
 
-Opções de restauração:
+Restoration options:
 
-### Restaure todo o servidor
+### Restore the entire server
 
-Restaura todos os arquivos.
+Restores all files.
 
-- Execute o script com a data desejada do backup a ser restaurado.
+- Run the script with the desired date of the backup to be restored.
 
 ```
 ./restore.sh 2023-07-15
 ```
 
-### Restaure Nextcloud/data
+### Restore Nextcloud/data
 
-Para restaurar somente a pasta ./data, siga as instruções abaixo.
+To restore only the ./data folder, follow the instructions below.
 
-- Em seu arquivo `restore.sh`, comente o intervalo de linhas abaixo.
+- In your `restore.sh` file, comment out the range of lines below.
 
 ```
-# Restaura o backup do Nextcloud
+# Restore Nextcloud backup
 
-echo "Restaurando backup das configurações do Nextcloud" >> $RESTLOGFILE_PATH
+echo "Restoring Nextcloud settings backup" >> $RESTLOGFILE_PATH
 
 borg extract -v --list $BORG_REPO::$ARCHIVE_NAME $NEXTCLOUD_CONF >> $RESTLOGFILE_PATH 2>&1
 
 echo
 echo "DONE!"
 
-Restaura o banco de dados
+Restore database
 
-echo "Restaurando banco de dados" >> $RESTLOGFILE_PATH
+echo "Restoring database" >> $RESTLOGFILE_PATH
 
-mysql -u --host=$HOSTNAME --user=$USER_NAME --password=$PASSWORD $DATABASE_NAME < "$NEXTCLOUD_CONF/nextclouddb.sql" >> $RESTLOGFILE_PATH
+mysql -u --host=$HOSTNAME --user=$user --password=$PASSWORD $DATABASE_NAME < "$NEXTCLOUD_CONF/nextclouddb.sql" >> $RESTLOGFILE_PATH
 
 echo
 echo "DONE!"
 ```
 
-- Execute o script com a data desejada do backup a ser restaurado.
+- Run the script with the desired date of the backup to be restored.
 
 ```
 ./restore.sh 2023-07-15
 ```
 
-### Restaure os dados em mídia removível
+### Restore data on removable media
 
-- Altere as variáveis `DEVICE` e `MOUNTDIR` `NEXTCLOUD_DATA` em seu arquivo `.conf`.
-- Em seu arquivo `restore.sh`, descomente as linhas a seguir.
+- Change the variables `DEVICE` and `MOUNTDIR` `NEXTCLOUD_DATA` in your `.conf` file.
+- In your `restore.sh` file, uncomment the lines below.
 
 ```
-# NÃO ALTERE
+# DO NOT CHANGE
 # MOUNT_FILE="/proc/mounts"
 # NULL_DEVICE="1> /dev/null 2>&1"
 # REDIRECT_LOG_FILE="1>> $LOGFILE_PATH 2>&1"
 
-# O dispositivo está montado?
+# Is device mounted?
 # grep -q "$DEVICE" "$MOUNT_FILE"
 # if [ "$?" != "0" ]; then
-# Se não, monte em $MOUNTDIR
-#  echo " Dispositivo não montado. Montando $DEVICE " >> $LOGFILE_PATH
+# If not, mount at $MOUNTDIR
+#  echo " Device not mounted. Mounting $DEVICE " >> $LOGFILE_PATH
 #  eval mount -t auto "$DEVICE" "$MOUNTDIR" "$NULL_DEVICE"
 #else
-# Se sim, grep o ponto de montagem e altere o $MOUNTDIR
+# If yes, grep mount point and change $MOUNTDIR
 #  DESTINATIONDIR=$(grep "$DEVICE" "$MOUNT_FILE" | cut -d " " -f 2)
 #fi
 
-# Há permissões de escrita e gravação?
+# Are there write and read permissions?
 # [ ! -w "$MOUNTDIR" ] && {
-#  echo " Não tem permissões de gravação " >> $LOGFILE_PATH
+#  echo " No write permissions " >> $LOGFILE_PATH
 #  exit 1
 #}
 ```
 
-### Para partições e mídias em formato NTFS exFAT e FAT32
+### For partitions and media in NTFS exFAT and FAT32 format
 
-1. Adicione a seguinte entrada no arquivo `/etc/fstab`:
+1. Add the following entry in the `/etc/fstab` file:
 
 ```
 UUID=089342544239044F /mnt/Multimidia ntfs-3g utf8,uid=www-data,gid=www-data,umask=0007,noatime,x-gvfs-show 0 0
 ```
 
-2. Altere o `UUID` para corresponder ao `UUID` da unidade que será montada. Para encontrar o `UUID` correto, execute o comando `sudo blkid`.
-3. Altere `/mnt/Multimidia` para o ponto de montagem de sua preferência. Se o ponto de montagem não existir, crie-o usando o comando `sudo mkdir /mnt/seu_pontodemontagem`.
-4. Altere `ntfs-3g` para o formato de partição desejado, como exFAT ou FAT32.
-5. Execute o comando `sudo mount -a` para montar a unidade.
-6. Se ocorrer algum erro ao executar o comando acima, instale os pacotes `ntfs-3g` para partições `NTFS` ou `exfat-fuse` e `exfat-utils` para partições `exFAT`.
+2. Change the UUID to match the UUID of the drive to be mounted. To find the correct UUID, run the command `sudo blkid`.
+3. Change /mnt/Multimidia to the mount point of your preference. If the mount point does not exist, create it using the command `sudo mkdir /mnt/your_mountpoint`.
+4. Change ntfs-3g to the desired partition format, such as exFAT or FAT32.
+5. Run the command `sudo mount -a` to mount the drive.
+6. If any error occurs when running the command above, install the packages ntfs-3g for NTFS partitions or exfat-fuse and exfat-utils for exFAT partitions.
 
-## Algumas observações importantes
+## Some important notes
 
-- É altamente recomendável desmontar a unidade local onde foi efetuado o backup após a conclusão do processo. Para isso, crie um agendamento no Cron para desmontar a unidade em um intervalo de 3 horas após o início do backup. Por exemplo:
+- It is highly recommended to unmount the local drive where the backup was made after the process is completed. To do this, create a schedule in Cron to unmount the drive at an interval of 3 hours after the backup start. For example:
 
 ```
 00 00 * * * sudo ./backup.sh
 00 03 * * * sudo systemctl stop backup.service
 ```
 
-Isso garantirá que o Rclone tenha tempo suficiente para completar o upload dos arquivos para a nuvem antes de desmontar a unidade.
+This will ensure that Rclone has enough time to complete the upload of files to the cloud before unmounting the drive.
 
-## Testes
+## Tests
 
-Em testes realizados, o tempo decorrido para o backup e restauração foi semelhante ao de outras ferramentas como `Duplicity` ou `Deja-Dup`.
+In tests performed, the elapsed time for backup and restoration was similar to that of other tools such as Duplicity or Deja-Dup.

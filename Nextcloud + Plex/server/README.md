@@ -1,48 +1,48 @@
 # Nextcloud server + PLEX
 
-Este diretório contém um script que realiza o backup e a restauração de sua instância Nextcloud, incluindo a pasta de dados, bem como as configurações do servidor PLEX. O backup é feito usando o Borg Backup e a montagem Rclone para armazenar seus backups em um serviço de nuvem de sua escolha.
+This directory contains a script that performs the backup and restoration of your Nextcloud instance, including the data folder, as well as the PLEX server settings. The backup is done using Borg Backup and Rclone mount to store your backups in a cloud service of your choice.
 
-## Início
+## Start
 
-- Certifique-se de que o `Nextcloud` já está instalado e funcionando corretamente.
-- Verifique se o `PLEX` já está instalado em seu sistema.
-- Verifique se os programas `rclone`, `borg` e `git` já estão instalados em seu sistema.
-- Clone este repositório usando o comando `git clone https://github.com/edsonsbj/Backup-Restore-Borg-Rclone.git`.
+- Make sure that `Nextcloud` is already installed and working properly.
+- Check if `PLEX` is already installed on your system.
+- Check if the programs `rclone`, `borg` and `git` are already installed on your system.
+- Clone this repository using the command `git clone https://github.com/edsonsbj/Backup-Restore-Borg-Rclone.git`.
 
 ## Backup
 
-1. Faça uma cópia do arquivo `example.conf` e renomeie-o de acordo com suas necessidades.
-2. Adicione as pastas que deseja fazer backup no arquivo `patterns.lst`. Por padrão, o arquivo já está pré-configurado para fazer backup das pastas do `Nextcloud`, incluindo a pasta de dados, excluindo a lixeira e também a pasta de configuração do `PLEX`.
-3. Defina as variáveis no arquivo `.conf` para corresponder às suas necessidades.
-4. Opcionalmente, mova os arquivos `backup.sh`, `patterns.lst`, `restore.sh` e o arquivo `.conf` recém-editado para uma pasta de sua preferência.
-5. Torne os scripts executáveis usando o comando `sudo chmod +x`.
-6. Substitua os valores `--config=/path/user/rclone.conf` e `Borg:`/ no arquivo `Backup.service` pelas configurações apropriadas, onde `--config` corresponde ao local do seu arquivo `rclone.conf` e `Borg:/` corresponde ao seu remoto (nuvem) a ser montado.
-7. Mova o `Backup.service` para a pasta `/etc/systemd/system/`.
-8. Execute o script `./backup.sh` ou crie um novo trabalho no Cron usando o comando `crontab -e`, conforme exemplo abaixo:
+1. Make a copy of the file `example.conf` and rename it according to your needs.
+2. Add the folders you want to backup in the file `patterns.lst`. By default, the file is already pre-configured to backup the `Nextcloud` folders, including the data folder, excluding the trash bin and also the configuration folder of `PLEX`.
+3. Set the variables in the `.conf` file to match your needs.
+4. Optionally, move the files `backup.sh`, `patterns.lst`, `restore.sh` and the newly edited `.conf` file to a folder of your preference.
+5. Make the scripts executable using the command `sudo chmod +x`.
+6. Replace the values `--config=/path/user/rclone.conf` and `Borg:`/ in the file `Backup.service` with the appropriate settings, where `--config` corresponds to the location of your `rclone.conf` file and `Borg:/` corresponds to your remote (cloud) to be mounted.
+7. Move the `Backup.service` to the folder `/etc/systemd/system/`.
+8. Run the script `./backup.sh` or create a new job in Cron using the command `crontab -e`, as shown below:
 
 ```
 00 00 * * * sudo ./backup.sh
 ```
 
-## Instalação do PLEX por meio de pacotes Snap
+## Installation of PLEX through Snap packages
 
-Se o PLEX foi instalado usando o comando `snap install plexmediaserver`, siga os passos abaixo:
+If PLEX was installed using the command `snap install plexmediaserver`, follow the steps below:
 
-1. Comente as linhas referentes ao PLEX no arquivo `patterns.lst`.
+1. Comment out the lines referring to PLEX in the file `patterns.lst`.
 ```
 sudo sed -i '31s/^/# /g' "/path/to/patterns.lst"
 sudo sed -i '11,14s/^/# /g' "/path/to/patterns.lst"
 ```
-2. Descomente as linhas referente ao snap no arquivo `patterns.lst`.
+2. Uncomment the lines referring to snap in the file `patterns.lst`.
 ```
 sudo sed -i '35s/^# //' "/path/to/patterns.lst"
 sudo sed -i '18,21s/^# //' "/path/to/patterns.lst"
 ```
-3. Altere a variável `PLEX_CONF` para corresponder ao caminho do snap no arquivo `example.conf`.
+3. Change the variable `PLEX_CONF` to match the snap path in the file `example.conf`.
 ```
 sudo sed -i "s/PLEX_CONF=\"\/var\/lib\/plexmediaserver\/Library\/Application Support\/Plex Media Server\"/PLEX_CONF=\"\/var\/snap\/plexmediaserver\/Library\/Application Support\/Plex Media Server\"/g" "/path/to/patterns.lst"
 ```
-4. Faça as alterações necessárias no script `backup.sh` e `restore.sh`.
+4. Make the necessary changes in the script `backup.sh` and `restore.sh`.
 ```
 sudo sed -i 's/systemctl start plexmediaserver/snap start plexmediaserver/g' "/path/to/backup.sh"
 sudo sed -i 's/systemctl stop plexmediaserver/snap stop plexmediaserver/g' "/path/to/backup.sh"
@@ -51,50 +51,50 @@ sudo sed -i 's/systemctl start plexmediaserver/snap start plexmediaserver/g' "/p
 sudo sed -i 's/systemctl stop plexmediaserver/snap stop plexmediaserver/g' "/path/to/restore.sh"
 ```
 
-## Restauração
+## Restoration
 
-Opções de restauração:
+Restoration options:
 
-### Restaure todo o servidor
+### Restore the entire server
 
-Restaura todos os arquivos.
+Restores all files.
 
-- Execute o script com a data desejada do backup a ser restaurado.
+- Run the script with the desired date of the backup to be restored.
 
 ```
 ./restore.sh 2023-07-15
 ```
 
-### Restaure o Nextcloud
+### Restore Nextcloud
 
-Para restaurar somente o Nextcloud, siga as instruções abaixo.
+To restore only Nextcloud, follow the instructions below.
 
-- Em seu arquivo `restore.sh`, comente o intervalo de linhas abaixo.
+- In your file `restore.sh`, comment out the range of lines below.
 
 ```
-# Restaura as configurações do PLEX
+# Restore PLEX settings
 
-echo "Restaurando backup PLEX" >> $RESTLOGFILE_PATH
+echo "Restoring PLEX backup" >> $RESTLOGFILE_PATH
 
-# Pare o PLEX
+# Stop PLEX
 
 sudo systemctl stop plexmediaserver
 
-# Remova a pasta atual do Plex
+# Remove the current Plex folder
 rm -rf $PLEX_CONF
 
 borg extract -v --list $BORG_REPO::$ARCHIVE_NAME $PLEX_CONF >> $RESTLOGFILE_PATH 2>&1
 
-# Restaura as permissões
+# Restore permissions
 
 chmod -R 755 PLEX_CONF
 chown -R plex:plex PLEX_CONF
 
-# Adicione o Usuário PLEX ao grupo www-data para acessar as pastas do Nextcloud
+# Add PLEX User to www-data group to access Nextcloud folders
 
 sudo adduser plex www-data
 
-# Inicie o PLEX
+# Start PLEX
 
 sudo systemctl start plexmediaserver
 
@@ -102,66 +102,64 @@ echo
 echo "DONE!"
 ```
 
-- Execute o script com a data desejada do backup a ser restaurado.
+- Run the script with the desired date of the backup to be restored.
 
 ```
 ./restore.sh 2023-07-15
 ```
 
-### Restaure Nextcloud/data
+### Restore Nextcloud/data
 
-Para restaurar somente a pasta ./data, siga as instruções abaixo.
+To restore only the ./data folder, follow the instructions below.
 
-- Em seu arquivo `restore.sh`, comente o intervalo de linhas abaixo.
+- In your `restore.sh` file, comment out the range of lines below.
 
 ```
-# Restaura o backup do Nextcloud
+# Restore Nextcloud backup
 
-echo "Restaurando backup das configurações do Nextcloud" >> $RESTLOGFILE_PATH
+echo "Restoring Nextcloud settings backup" >> $RESTLOGFILE_PATH
 
 borg extract -v --list $BORG_REPO::$ARCHIVE_NAME $NEXTCLOUD_CONF >> $RESTLOGFILE_PATH 2>&1
 
 echo
 echo "DONE!"
 
-Restaura o banco de dados
+Restore database
 
-echo "Restaurando banco de dados" >> $RESTLOGFILE_PATH
+echo "Restoring database" >> $RESTLOGFILE_PATH
 
-mysql -u --host=$HOSTNAME --user=$USER_NAME --password=$PASSWORD $DATABASE_NAME < "$NEXTCLOUD_CONF/nextclouddb.sql" >> $RESTLOGFILE_PATH
+mysql -u --host=$HOSTNAME --user=$user --password=$PASSWORD $DATABASE_NAME < "$NEXTCLOUD_CONF/nextclouddb.sql" >> $RESTLOGFILE_PATH
 
 echo
 echo "DONE!"
 ```
 
-- Execute o script com a data desejada do backup a ser restaurado.
+- Run the script with the desired date of the backup to be restored.
 
 ```
 ./restore.sh 2023-07-15
 ```
 
-### **Restaure o PLEX**
+### Restore PLEX
 
-Para restaurar somente as configurações do PLEX, siga as instruções abaixo.
+To restore only the PLEX settings, follow the instructions below.
 
-- Em seu arquivo `restore.sh` comente o intervalo de linhas abaixo.
+- In your `restore.sh` file, comment out the range of lines below.
 
 ```
-# Restaura o backup do Nextcloud
+# Restore Nextcloud backup
 
-echo "Restaurando backup das configurações do Nextcloud" >> $RESTLOGFILE_PATH
+echo "Restoring Nextcloud settings backup" >> $RESTLOGFILE_PATH
 
-# Ativando Modo de Manutenção Nextcloud
-
+# Enabling Nextcloud Maintenance Mode
 echo
 sudo -u www-data php $NEXTCLOUD_CONF/occ maintenance:mode --on >> $RESTLOGFILE_PATH
 echo
 
-# Pare o Apache
-
+# Stop Apache
 systemctl stop apache2
 
-# Remova a pasta atual do Nextcloud
+# Remove current Nextcloud folder
 rm -rf $NEXTCLOUD_CONF
 
 borg extract -v --list $BORG_REPO::$ARCHIVE_NAME $NEXTCLOUD_CONF >> $RESTLOGFILE_PATH 2>&1
@@ -169,103 +167,88 @@ borg extract -v --list $BORG_REPO::$ARCHIVE_NAME $NEXTCLOUD_CONF >> $RESTLOGFILE
 echo
 echo "DONE!"
 
-# Restaura o banco de dados
-
-echo "Restaurando banco de dados" >> $RESTLOGFILE_PATH
-
-mysql -u --host=$HOSTNAME --user=$USER_NAME --password=$PASSWORD $DATABASE_NAME < "$NEXTCLOUD_CONF/nextclouddb.sql" >> $RESTLOGFILE_PATH
-
+# Restore database
+echo "Restoring database" >> $RESTLOGFILE_PATH
+mysql -u --host=$HOSTNAME --user=$user --password=$PASSWORD $DATABASE_NAME < "$NEXTCLOUD_CONF/nextclouddb.sql" >> $RESTLOGFILE_PATH
 echo
 echo "DONE!"
 
-# Restaura a pasta ./data Nextcloud.
-# Útil se a pasta ./data estiver fora de /var/www/nextcloud caso contrário recomendo comentar a linha abaixo, pois seu servidor já estará restaurado com o comando acima.
-
-echo "Restaurando backup da pasta ./data" >> $RESTLOGFILE_PATH
-
+# Restore Nextcloud ./data folder.
+# Useful if the ./data folder is outside /var/www/nextcloud otherwise I recommend commenting out the line below, as your server will already be restored with the command above.
+echo "Restoring backup of ./data folder" >> $RESTLOGFILE_PATH
 borg extract -v --list $BORG_REPO::$ARCHIVE_NAME $NEXTCLOUD_DATA >> $RESTLOGFILE_PATH 2>&1
-
 echo
 echo "DONE!"
 
-# Restaura as permissões
-
+# Restore permissions
 chmod -R 770 $NEXTCLOUD_DATA
 chmod -R 755 $NEXTCLOUD_CONF
 chown -R www-data:www-data $NEXTCLOUD_DATA
 chown -R www-data:www-data $NEXTCLOUD_CONF
 
-# Inicia o Apache
-
+# Start Apache
 systemctl start apache2
 
-# Desativando Modo de Manutenção Nextcloud
-
+# Disabling Nextcloud Maintenance Mode
 echo
 sudo -u www-data php $NEXTCLOUD_CONF/occ maintenance:mode --off >> $RESTLOGFILE_PATH
 echo
 ```
-
-- Execute o script com a data desejada do backup a ser restaurado.
+- Run the script with the desired date of the backup to be restored.
 
 ```
 ./restore.sh 2023-07-15
 ```
 
-### Restaure os dados em mídia removível
+### Restore data on removable media
 
-- Altere as variáveis `DEVICE` e `MOUNTDIR` `NEXTCLOUD_DATA` em seu arquivo `.conf`.
-- Em seu arquivo `restore.sh`, descomente as linhas a seguir.
+- Change the variables `DEVICE` and `MOUNTDIR` `NEXTCLOUD_DATA` in your `.conf` file.
+- In your `restore.sh` file, uncomment the lines below.
 
 ```
-# NÃO ALTERE
+# DO NOT CHANGE
 # MOUNT_FILE="/proc/mounts"
 # NULL_DEVICE="1> /dev/null 2>&1"
 # REDIRECT_LOG_FILE="1>> $LOGFILE_PATH 2>&1"
 
-# O dispositivo está montado?
+# Is device mounted?
 # grep -q "$DEVICE" "$MOUNT_FILE"
 # if [ "$?" != "0" ]; then
-# Se não, monte em $MOUNTDIR
-#  echo " Dispositivo não montado. Montando $DEVICE " >> $LOGFILE_PATH
-#  eval mount -t auto "$DEVICE" "$MOUNTDIR" "$NULL_DEVICE"
+# If not, mount on $MOUNTDIR
+# echo "Device not mounted. Mounting $DEVICE" >> $LOGFILE_PATH
+# eval mount -t auto "$DEVICE" "$MOUNTDIR" "$NULL_DEVICE"
 #else
-# Se sim, grep o ponto de montagem e altere o $MOUNTDIR
-#  DESTINATIONDIR=$(grep "$DEVICE" "$MOUNT_FILE" | cut -d " " -f 2)
+# If yes, grep the mount point and change $MOUNTDIR
+# DESTINATIONDIR=$(grep "$DEVICE" "$MOUNT_FILE" | cut -d " " -f 2)
 #fi
 
-# Há permissões de escrita e gravação?
-# [ ! -w "$MOUNTDIR" ] && {
-#  echo " Não tem permissões de gravação " >> $LOGFILE_PATH
-#  exit 1
+# Are there write and record permissions?
+# [! -w "$MOUNTDIR"] && {
+# echo "No write permissions" >> $LOGFILE_PATH
+# exit 1
 #}
 ```
 
-### Para partições e mídias em formato NTFS exFAT e FAT32
+### For partitions and media in NTFS exFAT and FAT32 format
 
-1. Adicione a seguinte entrada no arquivo `/etc/fstab`:
-
+1. Add the following entry to the /etc/fstab file:
 ```
 UUID=089342544239044F /mnt/Multimidia ntfs-3g utf8,uid=www-data,gid=www-data,umask=0007,noatime,x-gvfs-show 0 0
 ```
+2. Change the `UUID` to match the `UUID` of the drive to be mounted. To find the correct `UUID`, run the `sudo blkid` command.
+3. Change `/mnt/Multimidia` to your preferred mount point. If the mount point does not exist, create it using the `sudo mkdir /mnt/your_mountpoint` command.
+4. Change `ntfs-3g` to the desired partition format, such as `exFAT or FAT32`.
+5. Run the `sudo mount -a` command to mount the drive.
+6. If an error occurs when running the above command, install the `ntfs-3g` packages for `NTFS` partitions or `exfat-fuse and exfat-utils` for `exFAT` partitions.
 
-2. Altere o `UUID` para corresponder ao `UUID` da unidade que será montada. Para encontrar o `UUID` correto, execute o comando `sudo blkid`.
-3. Altere `/mnt/Multimidia` para o ponto de montagem de sua preferência. Se o ponto de montagem não existir, crie-o usando o comando `sudo mkdir /mnt/seu_pontodemontagem`.
-4. Altere `ntfs-3g` para o formato de partição desejado, como exFAT ou FAT32.
-5. Execute o comando `sudo mount -a` para montar a unidade.
-6. Se ocorrer algum erro ao executar o comando acima, instale os pacotes `ntfs-3g` para partições `NTFS` ou `exfat-fuse` e `exfat-utils` para partições `exFAT`.
+## Some important observations
 
-## Algumas observações importantes
-
-- É altamente recomendável desmontar a unidade local onde foi efetuado o backup após a conclusão do processo. Para isso, crie um agendamento no Cron para desmontar a unidade em um intervalo de 3 horas após o início do backup. Por exemplo:
-
+- It is highly recommended to unmount the local drive where the backup was made after completion of the process. To do this, create a Cron schedule to unmount the drive at an interval of 3 hours after starting the backup. For example:
 ```
 00 00 * * * sudo ./backup.sh
 00 03 * * * sudo systemctl stop backup.service
 ```
+This will ensure that Rclone has enough time to complete uploading files to the cloud before unmounting the drive.
 
-Isso garantirá que o Rclone tenha tempo suficiente para completar o upload dos arquivos para a nuvem antes de desmontar a unidade.
-
-## Testes
-
-Em testes realizados, o tempo decorrido para o backup e restauração foi semelhante ao de outras ferramentas como `Duplicity` ou `Deja-Dup`.
+## Tests
+In tests performed, the elapsed time for backup and restoration was similar to other tools such as Duplicity or Deja-Dup.
