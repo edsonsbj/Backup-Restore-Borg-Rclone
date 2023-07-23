@@ -1,9 +1,19 @@
 P sh
 R /
 
-# DIRETÓRIOS PARA BACKUP  
-+ /home/usr1/*
+#NÃO OLHE AQUI
+! proc
+
+
+# NÃO FAÇA BACKUP 
+
 - /home/*/.cache
+- /home/User1
+
+# DIRETÓRIOS PARA BACKUP  
+
+
 + /home/usr2/Imagens
++ /home/user3
 + /root/
 - **
