@@ -30,13 +30,13 @@ Se o PLEX foi instalado usando o comando `snap install plexmediaserver`, siga os
 
 1. Comente as linhas referentes ao PLEX no arquivo `patterns.lst`.
 ```
-sudo sed -i '5s/^/# /g' "/path/to/patterns.lst"
-sudo sed -i '20,23s/^/# /g' "/path/to/patterns.lst"
+sudo sed -i '31s/^/# /g' "/path/to/patterns.lst"
+sudo sed -i '11,14s/^/# /g' "/path/to/patterns.lst"
 ```
 2. Descomente as linhas referente ao snap no arquivo `patterns.lst`.
 ```
-sudo sed -i '8s/^# //' "/path/to/patterns.lst"
-sudo sed -i '26,29s/^# //' "/path/to/patterns.lst"
+sudo sed -i '35s/^# //' "/path/to/patterns.lst"
+sudo sed -i '18,21s/^# //' "/path/to/patterns.lst"
 ```
 3. Altere a variável `PLEX_CONF` para corresponder ao caminho do snap no arquivo `example.conf`.
 ```
