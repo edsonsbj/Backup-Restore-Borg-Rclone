@@ -1,25 +1,28 @@
 P sh
 R /
 
+# NÃO OLHE AQUI
+! proc
+
 # DIRETÓRIOS PARA BACKUP EMBY MEDIA SERVER
-+ /var/lib/emby/config
-+ /var/lib/emby/data
-+ /var/lib/emby/metadata
-+ /var/lib/emby/plugins
-+ /var/lib/emby/root
-+ /var/lib/emby/ssl
++ var/lib/emby/config
++ var/lib/emby/data
++ var/lib/emby/metadata
++ var/lib/emby/plugins
++ var/lib/emby/root
++ var/lib/emby/ssl
 
 # DIRETÓRIOS PARA BACKUP JELLYFIN
-# + /var/lib/jellyfin
+# + var/lib/jellyfin
 
 # DIRETÓRIO CONTENDO SUAS CONFIGURAÇÕES EXPORTADAS
-+ /var/snap/nextcloud/common/backups/*.tar.gz
++ var/snap/nextcloud/common/backups/*.tar.gz
 
 # DIRETÓRIO DE DADOS. CASO TENHA MOVIDO SUA PASTA ./nextcloud/data PARA OUTRO LOCAL ALTERE O CAMINHO ABAIXO
-+ /var/snap/nextcloud/common/nextcloud/data
++ var/snap/nextcloud/common/nextcloud/data
 
 # NÃO INCLUA A LIXEIRA. CASO TENHA MOVIDO SUA PASTA ./nextcloud/data PARA OUTRO LOCAL ALTERE O CAMINHO ABAIXO
-- /var/snap/nextcloud/common/nextcloud/data/*/files_trashbin
+- var/snap/nextcloud/common/nextcloud/data/*/files_trashbin
 
 # Não Inclua mais nada
 - **
