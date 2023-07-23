@@ -18,9 +18,9 @@ fi
 
 info "Backup Iniciado" 2>&1 | tee -a $LOGFILE_PATH
 
-#gpg Descript
+# Cria as Pastas Necessarias
 
-/usr/bin/gpg --batch --no-tty --homedir $DIRGPG --passphrase-file $PASSFILE $RCLONECONFIG_CRIPT >> $LOGFILE_PATH 2>&1
+mkdir /mnt/rclone /var/log/Rclone /var/log/Borg
 
 # Monte o Rclone
 
@@ -62,12 +62,8 @@ borg prune                          \
 
 prune_exit=$?
 
-# Desmonte o Rclone
+# Desativando Modo de Manutenção Nextcloud
 
-sudo systemctl stop Backup.service
-
-# Por Seguranção remova o rclone.conf 
-rm -rf $RCLONECONFIG 
 
 # usa o código de saída mais alto como código de saída global
 global_exit=$(( backup_exit > prune_exit ? backup_exit : prune_exit ))

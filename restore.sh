@@ -17,7 +17,7 @@ then
 fi
 
 #
-# DESCOMENTE AS LINHAS ABAIXO CASO QUEIRA RESTAURAR ARQUIVOS DE UM HD EXTERNO.   
+# Descomente as linhas a seguir se for preciso efetuar a restauração de arquivos ou pastas de armazenamento externo como pendrives e HD's Externos
 
 # NÃO ALTERE
 # MOUNT_FILE="/proc/mounts"
@@ -57,29 +57,50 @@ else
     exit 1
 fi
 
+# Verifica se a data de restauração foi especificada
+if [ -z "$ARCHIVE_DATE" ]
+then
+    echo "Por favor, especifique a data de restauração."
+    exit 1
+fi
+
+# Verifica se a data de restauração e o arquivo a ser restaurado foram especificados
+if [ -z "$ARCHIVE_DATE" ] || [ -z "$FILE_TO_RESTORE" ]
+then
+    echo "Por favor, especifique a data de restauração e o arquivo a ser restaurado como primeiro e segundo argumentos, respectivamente."
+    exit 1
+fi
+
+# Encontra o nome do arquivo de backup correspondente à data especificada
+ARCHIVE_NAME=$(borg list $REPOSITORY | grep $ARCHIVE_DATE | awk '{print $1}')
+
+# Verifica se o arquivo de backup foi encontrado
+if [ -z "$ARCHIVE_NAME" ]
+then
+    echo "Não foi possível encontrar um arquivo de backup para a data especificada: $ARCHIVE_DATE"
+    exit 1
+fi
+
+# Restaura o arquivo especificado a partir do backup
+borg extract --list $REPOSITORY::$ARCHIVE_NAME $FILE_TO_RESTORE
+
 # Função para mensagens de erro
 errorecho() { cat <<< "$@" 1>&2; } 
 
-#gpg Descript
+# Cria as pastas necessarias
 
-/usr/bin/gpg --batch --no-tty --homedir $DIRGPG --passphrase-file $PASSFILE $RCLONECONFIG_CRIPT >> $RESTLOGFILE_PATH 2>&1
+mkdir /mnt/rclone/Borg /var/log/Rclone /var/log/Borg
 
 # Monte o Rclone
 
 sudo systemctl start Backup.service
 
-# Extraia os arquivos 
+# Restaura o backup do Nextcloud 
 # 
-echo "Restaurando Arquivos " $RESTLOGFILE_PATH
+echo "Restaurando backup" >> $RESTLOGFILE_PATH
 
-borg extract -v --list "$BORG_REPO::$(hostname)-$DATARESTORE" --patterns-from $PATTERNS >> $RESTLOGFILE_PATH 2>&1
-
-# Desmonte o Rclone
-sudo systemctl stop Backup.service
-
-# Por Segurança remova o rclone.conf
-rm -rf $RCLONECONFIG
+borg extract -v --list $BORG_REPO::$ARCHIVE_NAME $FILE_TO_RESTORE >> $RESTLOGFILE_PATH 2>&1
 
 echo
 echo "DONE!"
-echo "$(date "+%m-%d-%Y %T") : Restauração Concluida co sucesso." 2>&1 | tee -a $RESTLOGFILE_PATH
+echo "$(date "+%m-%d-%Y %T") : Successfully restored." 2>&1 | tee -a $RESTLOGFILE_PATH

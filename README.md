@@ -27,10 +27,10 @@ Este repositório contém scripts para realização de backup e restauração ut
 
 Restaura todos os arquivos.
 
-- Execute o script com a data desejada do backup a ser restaurado.
+- Execute o script com a data desejada do backup a ser restaurado juntamente com o arquivo ou diretorio que gostaria de restaurar.
 
 ```
-./restore.sh 2023-07-15
+./restore.sh 2023-07-15 home/
 ```
 
 ### Restaure os dados em mídia removível
