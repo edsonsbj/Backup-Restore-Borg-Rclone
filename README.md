@@ -77,13 +77,12 @@ Isso garantirá que o Rclone tenha tempo suficiente para completar o upload dos 
 
 Em testes realizados, o tempo decorrido para o backup e restauração foi semelhante ao de outras ferramentas como `Duplicity` ou `Deja-Dup`.
 
-
-## Nextcloud
+# Nextcloud
 Neste diretório, você encontrará dois scripts para realizar o backup e a restauração do Nextcloud, dependendo do tipo de instalação que você fez: manual (Apache + MySQL + PHP) ou por meio de pacotes snap.
 
-### Nextcloud + Plex
+# Nextcloud + Plex
 Use este script se você tiver um servidor Nextcloud e Plex na mesma máquina. Dentro da pasta, há duas opções de script, uma para cada tipo de instalação do Nextcloud.
 
-### Nextcloud + Emby (Jellyfin)
+# Nextcloud + Emby (Jellyfin)
 Use este script se você tiver um servidor Nextcloud e Emby na mesma máquina. Dentro da pasta, há duas opções de script, uma para cada tipo de instalação do Nextcloud. Além disso, é possível alterar o script caso você utilize o Jellyfin em vez do Emby.
 
