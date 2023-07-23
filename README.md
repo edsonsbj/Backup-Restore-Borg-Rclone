@@ -1,77 +1,89 @@
-# **Conjunto de Scripts para realizar backup e restauração usando Borg Backup e rclone**
+# Scripts de Backup e Restauração usando Borg Backup e Rclone
 
-Este conjunto reune scripts básicos para realizar backups automáticos usando Borg Backup e rclone. Ele usa um serviço systemd para montar um remoto rclone em uma pasta especifica como `/mnt/`.
+Este repositório contém scripts para realização de backup e restauração utilizando as ferramentas Borg e Rclone. O Rclone é usado para montar um serviço de nuvem de sua preferência em uma unidade local, permitindo a realização de backups e restaurações. 
 
-## **Realizando Backup**
+## Início
 
- 1. Certifique-se de que os pacotes `rclone` e  `borg `estejam instalados. 
-  2. Opicionalmente crie e criptografe seu arquivo `rclone.conf` com o comando
- ````
- sudo gpg --batch --no-tty --homedir /path/to/.gnupg --passphrase-file '/path/to/senha.txt' -c /path/to/rclone.conf.
- ````
- 3. Faça uma copia do arquivo `example.conf` e o renomeie.
- 4. Se preferir adicione as pastas para fazer backup no arquivo `patterns.lst`.
- 5. Defina as variáveis em seu arquivo `.conf`, para que corresponda as suas necessidades.
- 6. Se Preferir mova os arquivos `backup.sh`, `patterns.lst`, `restore.sh` e o arquivo recem editado `.conf` para uma pasta de sua preferência.
- 7. Torne os scripts executáveis `sudo chmod a+x`.
- 8. Altere as variáveis `AssertPathIsDirectory --config --cache-info-age=60m e ExecStop=/bin/fusermount -u` no arquivo `Backup.service`.
- 9. Mova o `Backup.service` para a pasta `/etc/systemd/system`.
-  10. Execute o script `backup.sh`ou agende o mesmo no Cron 
- ````
- 00 00 * * * sudo /path/to/backup.sh
- ```` 
-## **Restauração**
+- Verifique se os programas `rclone`, `borg` e `git` já estão instalados em seu sistema.
+- Clone este repositório usando o comando `git clone https://github.com/edsonsbj/Backup-Restore-Borg-Rclone.git`.
 
-1. Execute o comando `sudo borg list /path-to-your-repo.`
-2. Anote ou copie a data do backup que deseja restaurar 
-3. Informe a data na variável `DATARESTORE` em seu arquivo `.conf`
-4. Altere o caminho na variável `NEXTCLOUD_CONFIG` em seu arquivo `.conf` para que corresponda ao caminho exato onde o Nextcloud despejou as configurações exportadas. Geralmente `/var/snap/nextcloud/common/backups/20220430-200029`.
-5. Execute o script `restore.sh` ou agende o mesmo no cron.
-6. Caso queira restaurar uma determinada pasta em um HD Externo, altere as variáveis `DEVICE` e `MOUNTDIR` em seu arquivo `.conf`,  e descomente as linhas a seguir no arquivo `restore.sh:` 
+
+## Backup
+
+1. Faça uma cópia do arquivo `example.conf` e renomeie-o de acordo com suas necessidades.
+2. Adicione as pastas que deseja fazer backup no arquivo `patterns.lst`.
+3. Defina as variáveis no arquivo `.conf` para corresponder às suas necessidades.
+4. Opcionalmente, mova os arquivos `backup.sh`, `patterns.lst`, `restore.sh` e o arquivo `.conf` recém-editado para uma pasta de sua preferência.
+5. Torne os scripts executáveis usando o comando `sudo chmod +x`.
+6. Substitua os valores `--config=/path/user/rclone.conf` e `Borg:`/ no arquivo `Backup.service` pelas configurações apropriadas, onde `--config` corresponde ao local do seu arquivo `rclone.conf` e `Borg:/` corresponde ao seu remoto (nuvem) a ser montado.
+7. Mova o `Backup.service` para a pasta `/etc/systemd/system/`.
+8. Execute o script `./backup.sh` ou crie um novo trabalho no Cron usando o comando `crontab -e`, conforme exemplo abaixo:
+
+```
+00 00 * * * sudo ./backup.sh
+```
+
+## Restauração
+
+Restaura todos os arquivos.
+
+- Execute o script com a data desejada do backup a ser restaurado.
+
+```
+./restore.sh 2023-07-15
+```
+
+### Restaure os dados em mídia removível
+
+- Altere as variáveis `DEVICE` e `MOUNTDIR` `NEXTCLOUD_DATA` em seu arquivo `.conf`.
+- Em seu arquivo `restore.sh`, descomente as linhas a seguir.
+
 ```
 # NÃO ALTERE
 # MOUNT_FILE="/proc/mounts"
 # NULL_DEVICE="1> /dev/null 2>&1"
 # REDIRECT_LOG_FILE="1>> $LOGFILE_PATH 2>&1"
 
-# O Dispositivo está Montado?
+# O dispositivo está montado?
 # grep -q "$DEVICE" "$MOUNT_FILE"
 # if [ "$?" != "0" ]; then
-  # Se não, monte em $MOUNTDIR
-#  echo " Dispositivo não montado. Monte $DEVICE " >> $LOGFILE_PATH
+# Se não, monte em $MOUNTDIR
+#  echo " Dispositivo não montado. Montando $DEVICE " >> $LOGFILE_PATH
 #  eval mount -t auto "$DEVICE" "$MOUNTDIR" "$NULL_DEVICE"
 #else
-#  # Se sim, grep o ponto de montagem e altere o $MOUNTDIR
+# Se sim, grep o ponto de montagem e altere o $MOUNTDIR
 #  DESTINATIONDIR=$(grep "$DEVICE" "$MOUNT_FILE" | cut -d " " -f 2)
 #fi
 
-# Há permissões de excrita e gravação?
+# Há permissões de escrita e gravação?
 # [ ! -w "$MOUNTDIR" ] && {
 #  echo " Não tem permissões de gravação " >> $LOGFILE_PATH
 #  exit 1
-# }
+#}
 ```
 
-### Algumas Observações Importantes 
+## Algumas observações importantes
 
-   - A Criptografia do arquivo `rclone.conf` é opcional, caso não tenha interesse comente as linhas referente a gpg tanto no arquivo `backup.sh e restore.sh.`
-  ```
- #gpg Descript
+- É altamente recomendável desmontar a unidade local onde foi efetuado o backup após a conclusão do processo. Para isso, crie um agendamento no Cron para desmontar a unidade em um intervalo de 3 horas após o início do backup. Por exemplo:
 
-/usr/bin/gpg --batch --no-tty --homedir $DIRGPG --passphrase-file $PASSFILE $RCLONECONFIG_CRIPT >> $RESTLOGFILE_PATH 2>&1
 ```
-### Testes
+00 00 * * * sudo ./backup.sh
+00 03 * * * sudo systemctl stop backup.service
+```
 
- - Em testes realizados o tempo decorrido do backup e restauração foram semelhantes ao de outras ferramentas como `duplicity ou deja-dup.`
+Isso garantirá que o Rclone tenha tempo suficiente para completar o upload dos arquivos para a nuvem antes de desmontar a unidade.
 
-# **Nextcloud**
+## Testes
 
-- Utilize este script caso possua um servidor Nextcloud instalado por meio de Pacotes snap.
+Em testes realizados, o tempo decorrido para o backup e restauração foi semelhante ao de outras ferramentas como `Duplicity` ou `Deja-Dup`.
 
-# **Nextcloud + Emby**
 
-- Utilize este script caso possua um servidor Nextcloud e Plex na mesma maquina. Lembrando que a instalação do Nextcloud mencionada no script e por meio de pacotes snap.
-- 
-# **Nextcloud + Plex**
+## Nextcloud
+Neste diretório, você encontrará dois scripts para realizar o backup e a restauração do Nextcloud, dependendo do tipo de instalação que você fez: manual (Apache + MySQL + PHP) ou por meio de pacotes snap.
 
-- Utilize este script caso possua um servidor Nextcloud e emby na mesma maquina. Lembrando que a instalação do Nextcloud mencionada no script e por meio de pacotes snap.
+### Nextcloud + Plex
+Use este script se você tiver um servidor Nextcloud e Plex na mesma máquina. Dentro da pasta, há duas opções de script, uma para cada tipo de instalação do Nextcloud.
+
+### Nextcloud + Emby (Jellyfin)
+Use este script se você tiver um servidor Nextcloud e Emby na mesma máquina. Dentro da pasta, há duas opções de script, uma para cada tipo de instalação do Nextcloud. Além disso, é possível alterar o script caso você utilize o Jellyfin em vez do Emby.
+
