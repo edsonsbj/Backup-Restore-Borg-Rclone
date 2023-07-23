@@ -7,29 +7,29 @@ After=Multimidia.service
 [Service]
 Type=simple
 ExecStart=/usr/bin/rclone mount \
-# Local do arquivo rclone.conf
+# Location of the rclone.conf file
         --config=/path/user/rclone.conf \
-# Isso é para permitir que usuários que não sejam o usuário executando o rclone acessem a montagem
+# This is to allow users who are not the user running rclone to access the mount
         --allow-other \
-# O disco local usado para cache
+# The local disk used for cache
         --cache-dir=/tmp/rclone/vfs \
-# Não atualizar o mod-time de destino se os ficheiros forem idênticos
+# Do not update the destination mod-time if files are identical
         --no-modtime \
-# Intervalo entre estatísticas de impressão, por exemplo, 500ms, 60s, 5m (0 para desativar) (predefinição 1m0s)
+# Interval between printing stats, e.g. 500ms, 60s, 5m (0 to disable) (default 1m0s)
         --stats=0 \
-# Isso define um controle de largura de banda por arquivo e eu limito isso a um pouco maior do que minha maior taxa de bits que eu gostaria de reproduzir
+# This sets a per file bandwidth control and I limit this to a bit higher than my highest bitrate I would like to play back
         --bwlimit=30M \
-# Tempo para guardar em cache os registos de diretório
+# Time to cache directory entries for
         --dir-cache-time=120m \
-# Isso é usado para armazenar arquivos em cache no disco local para streaming
+# This is used to cache files on the local disk for streaming
         --vfs-cache-mode full \
-# Isso limita o tamanho do cache ao valor abaixo
+# This limits the cache size to the value below
         --vfs-cache-max-size 20G \
-# Defini o agente do utilizador para uma cadeia de caracteres especifica
+# Set the user agent to a specific string
 	--user-agent "ISV|rclone.org|rclone/v1.62.2" \
-# Não criar versões Onedrive Business
+# Do not create Onedrive Business versions
         --onedrive-no-versions \
-# Defina o tpslimit
+# Set the tpslimit
         --tpslimit 4 \
         --cache-info-age=60m Borg:/ /mnt/rclone/Borg
 ExecStop=/bin/fusermount -u /mnt/rclone/Borg
