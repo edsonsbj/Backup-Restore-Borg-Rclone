@@ -175,7 +175,7 @@ echo "DONE!"
 
 #cp /etc/fstab /etc/fstab.bk
 #sudo cat <<EOF >>/etc/fstab
-#UUID=089342544239044F /mnt/SEUHD ntfs-3g utf8,uid=www-data,gid=www-data,umask=0007,noatime,x-gvfs-show 0 0
+#UUID=089342544239044F /mnt/SEUHD ntfs-3g utf8,uid=root,gid=root,umask=0007,noatime,x-gvfs-show 0 0
 #EOF
 
 echo

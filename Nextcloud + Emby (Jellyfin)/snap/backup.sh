@@ -81,7 +81,7 @@ prune_exit=$?
 # Desativando Modo de Manutenção Nextcloud
 
 echo  
-sudo nextcloudocc maintenance:mode --off >> $LOGFILE_PATH
+sudo nextcloud.occ maintenance:mode --off >> $LOGFILE_PATH
 echo
 
 # Inicie o Emby
