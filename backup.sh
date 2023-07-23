@@ -62,9 +62,6 @@ borg prune                          \
 
 prune_exit=$?
 
-# Desativando Modo de Manutenção Nextcloud
-
-
 # usa o código de saída mais alto como código de saída global
 global_exit=$(( backup_exit > prune_exit ? backup_exit : prune_exit ))
 
