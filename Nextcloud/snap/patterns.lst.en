@@ -1,0 +1,14 @@
+Psh
+R /
+
+# DIRECTORY CONTAINING YOUR EXPORTED SETTINGS
++ /var/snap/nextcloud/common/backups/*.tar.gz
+
+# DATA DIRECTORY. IF YOU HAVE MOVED YOUR ./nextcloud/data FOLDER TO ANOTHER LOCATION, CHANGE THE PATH BELOW
++ /var/snap/nextcloud/common/nextcloud/data
+
+# DO NOT INCLUDE THE TRASH BIN. IF YOU HAVE MOVED YOUR ./nextcloud/data FOLDER TO ANOTHER LOCATION, CHANGE THE PATH BELOW
+- /var/snap/nextcloud/common/nextcloud/data/*/files_trashbin
+
+# Do not include anything else
+- **
