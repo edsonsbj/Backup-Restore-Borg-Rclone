@@ -1,14 +1,14 @@
 P sh
 R /
 
-# DIRETÓRIO CONTENDO SUAS CONFIGURAÇÕES EXPORTADAS
-+ /var/snap/nextcloud/common/backups/*.tar.gz
+# DIRECTORY CONTAINING YOUR EXPORTED SETTINGS
++ var/snap/nextcloud/common/backups/*.tar.gz
 
-# DIRETÓRIO DE DADOS. CASO TENHA MOVIDO SUA PASTA ./nextcloud/data PARA OUTRO LOCAL ALTERE O CAMINHO ABAIXO
-+ /var/snap/nextcloud/common/nextcloud/data
+# DATA DIRECTORY. IF YOU HAVE MOVED YOUR ./nextcloud/data FOLDER TO ANOTHER LOCATION, CHANGE THE PATH BELOW
++ var/snap/nextcloud/common/nextcloud/data
 
-# NÃO INCLUA A LIXEIRA. CASO TENHA MOVIDO SUA PASTA ./nextcloud/data PARA OUTRO LOCAL ALTERE O CAMINHO ABAIXO
-- /var/snap/nextcloud/common/nextcloud/data/*/files_trashbin
+# DO NOT INCLUDE THE TRASH BIN. IF YOU HAVE MOVED YOUR ./nextcloud/data FOLDER TO ANOTHER LOCATION, CHANGE THE PATH BELOW
+- var/snap/nextcloud/common/nextcloud/data/*/files_trashbin
 
-# Não Inclua mais nada
+# Do not include anything else
 - **

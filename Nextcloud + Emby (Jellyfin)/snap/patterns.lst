@@ -1,10 +1,23 @@
 P sh
 R /
 
-# NÃO OLHE AQUI
+# DO NOT LOOK IN THESE FOLDERS
 ! proc
 
-# DIRETÓRIOS PARA BACKUP EMBY MEDIA SERVER
+# DIRECTORIES TO BE EXCLUDED FROM BACKUP  
+
+# NEXTCLOUD
+- var/snap/nextcloud/common/nextcloud/data/*/files_trashbin
+
+# DIRECTORIES FOR BACKUP 
+
+# NEXTCLOUD - SETTINGS
++ var/snap/nextcloud/common/backups/*.tar.gz
+
+# DATA DIRECTORY. IF YOU HAVE MOVED YOUR ./nextcloud/data FOLDER TO ANOTHER LOCATION, CHANGE THE PATH BELOW
++ var/snap/nextcloud/common/nextcloud/data
+
+# DIRECTORY CONTAINING THE EMBY MEDIA SERVER CONFIGURATIONS..
 + var/lib/emby/config
 + var/lib/emby/data
 + var/lib/emby/metadata
@@ -12,17 +25,8 @@ R /
 + var/lib/emby/root
 + var/lib/emby/ssl
 
-# DIRETÓRIOS PARA BACKUP JELLYFIN
+# DIRECTORY CONTAINING THE jELLYFIN CONFIGURATIONS
 # + var/lib/jellyfin
 
-# DIRETÓRIO CONTENDO SUAS CONFIGURAÇÕES EXPORTADAS
-+ var/snap/nextcloud/common/backups/*.tar.gz
-
-# DIRETÓRIO DE DADOS. CASO TENHA MOVIDO SUA PASTA ./nextcloud/data PARA OUTRO LOCAL ALTERE O CAMINHO ABAIXO
-+ var/snap/nextcloud/common/nextcloud/data
-
-# NÃO INCLUA A LIXEIRA. CASO TENHA MOVIDO SUA PASTA ./nextcloud/data PARA OUTRO LOCAL ALTERE O CAMINHO ABAIXO
-- var/snap/nextcloud/common/nextcloud/data/*/files_trashbin
-
-# Não Inclua mais nada
+# DO NOT INCLUDE ANY MORE FILES
 - **

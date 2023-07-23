@@ -1,19 +1,17 @@
 P sh
 R /
 
-#NÃO OLHE AQUI
+# DO NOT LOOK IN THESE FOLDERS
 ! proc
 
+# DIRECTORIES TO BE EXCLUDED FROM BACKUP  
+- home/*/.cache
+- home/User1
 
-# NÃO FAÇA BACKUP 
+# DIRECTORIES FOR BACKUP 
++ home/usr2/Imagens
++ home/user3
++ root
 
-- /home/*/.cache
-- /home/User1
-
-# DIRETÓRIOS PARA BACKUP  
-
-
-+ /home/usr2/Imagens
-+ /home/user3
-+ /root/
+# DO NOT INCLUDE ANY MORE FILES
 - **

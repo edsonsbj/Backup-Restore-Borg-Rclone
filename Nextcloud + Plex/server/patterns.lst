@@ -1,44 +1,39 @@
 P sh
 R /
 
-# NÃO OLHE NESTAS PASTAS
+# DO NOT LOOK IN THESE FOLDERS
 ! proc
 
-# DIRETÓRIOS A SEREM EXCLUIDOS DO BACKUP  
+# DIRECTORIES TO BE EXCLUDED FROM BACKUP  
 
 # PLEX (.DEB)
-
-- /var/lib/plexmediaserver/Library/Application Support/Plex Media Server/Cache
-- /var/lib/plexmediaserver/Library/Application Support/Plex Media Server/Crash Reports
-- /var/lib/plexmediaserver/Library/Application Support/Plex Media Server/Diagnostics
-- /var/lib/plexmediaserver/Library/Application Support/Plex Media Server/Logs
+- var/lib/plexmediaserver/Library/Application Support/Plex Media Server/Cache
+- var/lib/plexmediaserver/Library/Application Support/Plex Media Server/Crash Reports
+- var/lib/plexmediaserver/Library/Application Support/Plex Media Server/Diagnostics
+- var/lib/plexmediaserver/Library/Application Support/Plex Media Server/Logs
 
 # PLEX (SNAP)
-
-# - /var/snap/plexmediaserver/common/Library/Application Support/Plex Media Server/Cache
-# - /var/snap/plexmediaserver/common/Library/Application Support/Plex Media Server/Crash Reports
-# - /var/snap/plexmediaserver/common/Library/Application Support/Plex Media Server/Diagnostics
-# - /var/snap/plexmediaserver/common/Library/Application Support/Plex Media Server/Logs
+# - var/snap/plexmediaserver/common/Library/Application Support/Plex Media Server/Cache
+# - var/snap/plexmediaserver/common/Library/Application Support/Plex Media Server/Crash Reports
+# - var/snap/plexmediaserver/common/Library/Application Support/Plex Media Server/Diagnostics
+# - var/snap/plexmediaserver/common/Library/Application Support/Plex Media Server/Logs
 
 # NEXTCLOUD
+- var/www/nextcloud/data/*/files_trashbin
 
-- /var/www/nextcloud/data/*/files_trashbin
-
-# DIRETÓRIOS PARA BACKUP 
+# DIRECTORIES FOR BACKUP 
 
 # PLEX (.DEB)
-
-+ /var/lib/plexmediaserver/Library/Application Support/Plex Media Server
++ var/lib/plexmediaserver/Library/Application Support/Plex Media Server
 
 # PLEX (SNAP)
+# + var/snap/plexmediaserver/common/Library/Application Support/Plex Media Server/
 
-# + /var/snap/plexmediaserver/common/Library/Application Support/Plex Media Server/
+# NEXTCLOUD - SETTINGS
++ var/www/nextcloud
 
-# NEXTCLOUD - CONFIGURAÇÕES
-+ /var/www/nextcloud
+# DATA DIRECTORY. IF YOU HAVE MOVED YOUR ./nextcloud/data FOLDER TO ANOTHER LOCATION, CHANGE THE PATH BELOW
++ var/www/nextcloud/data
 
-# DIRETÓRIO DE DADOS. CASO TENHA MOVIDO SUA PASTA ./nextcloud/data PARA OUTRO LOCAL ALTERE O CAMINHO ABAIXO
-+ /var/www/nextcloud/data
-
-# NÃO INCLUIR MAIS NENHUM ARQUIVO
+# DO NOT INCLUDE ANY MORE FILES
 - **
