@@ -30,11 +30,11 @@ Se você optou por usar o `Jellyfin` em vez do `Emby`, execute os comandos abaix
 
 1. Comente as linhas referente ao emby no arquivo `patterns.lst`.
 ````
-sudo sed -i '5,10s/^/# /g' "/path/to/patterns.lst"
+sudo sed -i '8,13s/^/# /g' "/path/to/patterns.lst"
 ````
 2. Descomente a linha referente ao Jellyfin no arquivo `patterns.lst`.
 ````
-sudo sed -i '13s/^# //' "/path/to/patterns.lst"
+sudo sed -i '16s/^# //' "/path/to/patterns.lst"
 ````
 3. Altera a variável `EMBY_CONF` para corresponder ao caminho das configurações do Jellyfin no arquivo ``example.conf`.
 ````
