@@ -95,7 +95,7 @@ mkdir /mnt/rclone/Borg /var/log/Rclone /var/log/Borg
 
 sudo systemctl start Backup.service
 
-# Restaura o backup do Nextcloud 
+# Restaura o backup
 # 
 echo "Restaurando backup" >> $RESTLOGFILE_PATH
 
