@@ -3,144 +3,144 @@
 CONFIG="/path/to/.conf"
 . $CONFIG
 
-# Alguns auxiliares e tratamento de erros:
-info() { printf "\n%s %s\n\n" "$( date )" "$*" >&2; }
-trap 'echo $( date ) Backup interrompido >&2; exit 2' INT TERM
+# Some helpers and error handling:
+info() { printf "\n%s %s\n\n" "$(date)" "$*" >&2; }
+trap 'echo "$(date) Backup interrupted" >&2; exit 2' INT TERM
 
 #
-# Verifica se o Script é executado pelo root
+# Check if the script is executed by root
 #
 if [ "$(id -u)" != "0" ]
 then
-        errorecho "ERRO: Este script deve ser executado como root!"
+        errorecho "ERROR: This script must be executed as root!"
         exit 1
 fi
 
 #
-# Descomente as linhas a seguir se for preciso efetuar a restauração de arquivos ou pastas de armazenamento externo como pendrives e HD's Externos
+# Uncomment the following lines if you need to restore files or folders from external storage devices such as pendrives and external hard drives.
 
-# NÃO ALTERE
+# DO NOT MODIFY
 # MOUNT_FILE="/proc/mounts"
 # NULL_DEVICE="1> /dev/null 2>&1"
 # REDIRECT_LOG_FILE="1>> $LOGFILE_PATH 2>&1"
 
-# O Dispositivo está Montado?
+# Is the device mounted?
 # grep -q "$DEVICE" "$MOUNT_FILE"
 # if [ "$?" != "0" ]; then
-  # Se não, monte em $MOUNTDIR
-#  echo " Dispositivo não montado. Monte $DEVICE " >> $LOGFILE_PATH
+  # If not, mount it to $MOUNTDIR
+#  echo "Device not mounted. Mount $DEVICE " >> $LOGFILE_PATH
 #  eval mount -t auto "$DEVICE" "$MOUNTDIR" "$NULL_DEVICE"
 #else
-#  # Se sim, grep o ponto de montagem e altere o $MOUNTDIR
+#  # If yes, grep the mount point and set $MOUNTDIR accordingly
 #  DESTINATIONDIR=$(grep "$DEVICE" "$MOUNT_FILE" | cut -d " " -f 2)
 #fi
 
-# Há permissões de excrita e gravação?
+# Are there write and read permissions?
 # [ ! -w "$MOUNTDIR" ] && {
-#  echo " Não tem permissões de gravação " >> $LOGFILE_PATH
+#  echo "No write permissions " >> $LOGFILE_PATH
 #  exit 1
 # }
 
-info "Restauração Iniciada" 2>&1 | tee -a $RESTLOGFILE_PATH
+info "Restoration Started" 2>&1 | tee -a $RESTLOGFILE_PATH
 
-# Mude para o diretório raiz. Isso é crítico pois o borg extract usa diretório relativo portanto devemos mudar para a raiz do sistema para que a restauração ocorra sem erros ou em diretórios aleatorios.
+# Change to the root directory. This is critical because borg extract uses relative directory, so we must change to the root of the system to avoid errors or random directories during restoration.
 
-echo "Mudando para o diretório raiz..."
+echo "Changing to the root directory..."
 cd /
 echo "pwd is $(pwd)"
-echo "local do arquivo de backup db é " '/'
+echo "location of the database backup file is " '/'
 
 if [ $? -eq 0 ]; then
     echo "Done"
 else
-    echo "falha ao mudar para o diretório raiz. Falha na restauração"
+    echo "Failed to change to the root directory. Restoration failed."
     exit 1
 fi
 
-# Verifica se a data de restauração foi especificada
+# Check if the restoration date is specified
 if [ -z "$ARCHIVE_DATE" ]
 then
-    echo "Por favor, especifique a data de restauração."
+    echo "Please specify the restoration date."
     exit 1
 fi
 
-# Encontra o nome do arquivo de backup correspondente à data especificada
+# Find the backup file name corresponding to the specified date
 ARCHIVE_NAME=$(borg list $BORG_REPO | grep $ARCHIVE_DATE | awk '{print $1}')
 
-# Verifica se o arquivo de backup foi encontrado
+# Check if the backup file is found
 if [ -z "$ARCHIVE_NAME" ]
 then
-    echo "Não foi possível encontrar um arquivo de backup para a data especificada: $ARCHIVE_DATE"
+    echo "Could not find a backup file for the specified date: $ARCHIVE_DATE"
     exit 1
 fi
 
-# Função para mensagens de erro
+# Function for error messages
 errorecho() { cat <<< "$@" 1>&2; } 
 
-# Cria as pastas necessarias
+# Create the necessary folders
 
 mkdir /mnt/rclone/Borg /var/log/Rclone /var/log/Borg
 
-# Monte o Rclone
+# Mount Rclone
 
 sudo systemctl start Backup.service
 
-# Restaura o backup do Nextcloud 
-# 
-echo "Restaurando backup das configurações do Nextcloud" >> $RESTLOGFILE_PATH
+# Restore Nextcloud backup
 
-# Ativando Modo de Manutenção
+echo "Restoring Nextcloud settings backup" >> $RESTLOGFILE_PATH
+
+# Enable Maintenance Mode
 
 echo
 sudo -u www-data php $NEXTCLOUD_CONF/occ maintenance:mode --on >> $RESTLOGFILE_PATH
 echo 
 
-# Pare o Apache
+# Stop Apache
 
 systemctl stop apache2
 
-# Remova a pasta atual do Nextcloud
+# Remove the current Nextcloud folder
 
 rm -rf $NEXTCLOUD_CONF
 
-# Extraia os Arquivos
+# Extract Files
 
 borg extract -v --list $BORG_REPO::$ARCHIVE_NAME $NEXTCLOUD_CONF >> $RESTLOGFILE_PATH 2>&1
 
 echo
 echo "DONE!"
 
-# Restaura o banco de dados 
+# Restore the database
 
-echo "Restaurando banco de dados" >> $RESTLOGFILE_PATH
+echo "Restoring database" >> $RESTLOGFILE_PATH
 
 mysql -u --host=$HOSTNAME --user=$USER_NAME --password=$PASSWORD $DATABASE_NAME < "$NEXTCLOUD_CONF/nextclouddb.sql" >> $RESTLOGFILE_PATH
 
 echo
 echo "DONE!"
 
-# Restaura a pasta ./data Nextcloud.
-# Útil se a pasta ./data estiver fora de /var/www/nextcloud caso contrario recomendo comentar a linha abaixo, pois seu servidor já estará restaurado com o comando acima. 
-# 
-echo "Restaurando backup da pasta ./data" >> $RESTLOGFILE_PATH
+# Restore the ./data folder in Nextcloud.
+# Useful if the ./data folder is outside /var/www/nextcloud, otherwise it is recommended to comment the line below, as your server will already be restored with the above command. 
+
+echo "Restoring ./data folder backup" >> $RESTLOGFILE_PATH
 
 borg extract -v --list $BORG_REPO::$ARCHIVE_NAME $NEXTCLOUD_DATA >> $RESTLOGFILE_PATH 2>&1
 
 echo
 echo "DONE!"
 
-# Restaura as permissões 
+# Restore permissions
 
 chmod -R 770 $NEXTCLOUD_DATA 
 chmod -R 755 $NEXTCLOUD_CONF
 chown -R www-data:www-data $NEXTCLOUD_DATA
 chown -R www-data:www-data $NEXTCLOUD_CONF
 
-# Inicia o Apache
+# Start Apache
 
 systemctl start apache2
 
-# Desativando Modo de Manutenção Nextcloud
+# Disable Maintenance Mode in Nextcloud
 
 echo  
 sudo -u www-data php $NEXTCLOUD_CONF/occ maintenance:mode --off >> $RESTLOGFILE_PATH
@@ -149,61 +149,61 @@ echo
 echo
 echo "DONE!"
 
-# Restaura as configurações do Plex Media Server 
+# Restore Plex Media Server settings
 
-echo "Restaurando backup Plex" >> $RESTLOGFILE_PATH
+echo "Restoring Plex backup" >> $RESTLOGFILE_PATH
 
-# Pare o plex
+# Stop Plex
 
 sudo systemctl stop plexmediaserver
 
-# Pare o plex (snap)
+# Stop Plex (snap)
 
 #sudo snap stop plexmediaserver
 
-# Remova a Pasta atual do Plex
+# Remove the current Plex folder
 
 rm -rf $PLEX_CONF
 
-# Extraia os arquivos
+# Extract Files
 
 borg extract -v --list $BORG_REPO::$ARCHIVE_NAME $PLEX_CONF >> $RESTLOGFILE_PATH 2>&1
 
-# Restaura as permissões
+# Restore permissions
 
 chmod -R 755 $PLEX_CONF
 chown -R plex:plex $PLEX_CONF
 
-# Restaura as permissões (snap)
+# Restore permissions (snap)
 
 #chmod -R 755 $PLEX_CONF
 #chown -R root:root $PLEX_CONF
 
-# Adicione o Usuário Plex ao grupo www-data para acessar as pastas do Nextcloud
+# Add the Plex User to the www-data group to access Nextcloud folders
 
 sudo adduser plex www-data
 
-# Adicione o Usuário Plex ao grupo www-data para acessar as pastas do Nextcloud (snap)
+# Add the Plex User to the www-data group to access Nextcloud folders (snap)
 
 #sudo adduser root www-data
 
-# Inicie o PLEX
+# Start PLEX
 
 sudo systemctl start plexmediaserver
 
-# Inicia o Plex (snap)
+# Start Plex (snap)
 
 #sudo snap start plexmediaserver
 
 echo
 echo "DONE!"
 
-# Para sistemas de arquivos NTFS e FAT32 entre outros que não aceitam permissões convêm adicionar uma entrada em seu arquivo /etc/fstab para isso descomente a linha abaixo e altere o UUID /mnt/SEUHD e o campo ntfs-3g.
-# Para encontrar o UUID de sua partição ou HD execute o comando sudo blkid. 
+# For NTFS and FAT32 file systems, and others that do not accept permissions, it is convenient to add an entry to your /etc/fstab file. Uncomment the line below and change the UUID /mnt/YOURHD and ntfs-3g field accordingly.
+# To find the UUID of your partition or HD, run the command sudo blkid.
 
 #cp /etc/fstab /etc/fstab.bk
 #sudo cat <<EOF >>/etc/fstab
-#UUID=089342544239044F /mnt/SEUHD ntfs-3g utf8,uid=www-data,gid=www-data,umask=0007,noatime,x-gvfs-show 0 0
+#UUID=089342544239044F /mnt/YOURHD ntfs-3g utf8,uid=www-data,gid=www-data,umask=0007,noatime,x-gvfs-show 0 0
 #EOF
 
 echo

@@ -3,180 +3,173 @@
 CONFIG="/path/to/.conf"
 . $CONFIG
 
-# Alguns auxiliares e tratamento de erros:
-info() { printf "\n%s %s\n\n" "$( date )" "$*" >&2; }
-trap 'echo $( date ) Backup interrompido >&2; exit 2' INT TERM
+# Some helpers and error handling:
+info() { printf "\n%s %s\n\n" "$(date)" "$*" >&2; }
+trap 'echo $(date) Backup interrupted >&2; exit 2' INT TERM
 
 #
-# Verifica se o Script é executado pelo root
+# Check if the script is executed by root
 #
 if [ "$(id -u)" != "0" ]
 then
-        errorecho "ERRO: Este script deve ser executado como root!"
+        echo "ERROR: This script must be executed as root!"
         exit 1
 fi
 
 #
-# Descomente as linhas a seguir se for preciso efetuar a restauração de arquivos ou pastas de armazenamento externo como pendrives e HD's Externos
+# Uncomment the following lines if you need to restore files or folders from external storage devices such as USB drives and external HDDs
 
-# NÃO ALTERE
+# DO NOT MODIFY
 # MOUNT_FILE="/proc/mounts"
 # NULL_DEVICE="1> /dev/null 2>&1"
 # REDIRECT_LOG_FILE="1>> $LOGFILE_PATH 2>&1"
 
-# O Dispositivo está Montado?
+# Is the device mounted?
 # grep -q "$DEVICE" "$MOUNT_FILE"
 # if [ "$?" != "0" ]; then
-  # Se não, monte em $MOUNTDIR
-#  echo " Dispositivo não montado. Monte $DEVICE " >> $LOGFILE_PATH
+  # If not, mount it at $MOUNTDIR
+#  echo "Device not mounted. Mount $DEVICE " >> $LOGFILE_PATH
 #  eval mount -t auto "$DEVICE" "$MOUNTDIR" "$NULL_DEVICE"
 #else
-#  # Se sim, grep o ponto de montagem e altere o $MOUNTDIR
+#  # If yes, grep the mount point and change $MOUNTDIR
 #  DESTINATIONDIR=$(grep "$DEVICE" "$MOUNT_FILE" | cut -d " " -f 2)
 #fi
 
-# Há permissões de excrita e gravação?
+# Are there write and execute permissions?
 # [ ! -w "$MOUNTDIR" ] && {
-#  echo " Não tem permissões de gravação " >> $LOGFILE_PATH
+#  echo "Does not have write permissions " >> $LOGFILE_PATH
 #  exit 1
 # }
 
-info "Restauração Iniciada" 2>&1 | tee -a $RESTLOGFILE_PATH
+info "Restoration Started" 2>&1 | tee -a $RESTLOGFILE_PATH
 
-# Mude para o diretório raiz. Isso é crítico pois o borg extract usa diretório relativo portanto devemos mudar para a raiz do sistema para que a restauração ocorra sem erros ou em diretórios aleatorios.
+# Change to the root directory. This is critical as borg extract uses a relative directory, so we need to change to the root of the system to ensure the restoration occurs without errors or in random directories.
 
-echo "Mudando para o diretório raiz..."
+echo "Changing to the root directory..."
 cd /
 echo "pwd is $(pwd)"
-echo "local do arquivo de backup db é " '/'
+echo "location of the backup db file is " '/'
 
 if [ $? -eq 0 ]; then
     echo "Done"
 else
-    echo "falha ao mudar para o diretório raiz. Falha na restauração"
+    echo "Failed to change to the root directory. Restoration failed."
     exit 1
 fi
 
-# Verifica se a data de restauração foi especificada
+# Check if the restoration date has been specified
 if [ -z "$ARCHIVE_DATE" ]
 then
-    echo "Por favor, especifique a data de restauração."
+    echo "Please specify the restoration date."
     exit 1
 fi
 
-# Encontra o nome do arquivo de backup correspondente à data especificada
+# Find the backup file name corresponding to the specified date
 ARCHIVE_NAME=$(borg list $BORG_REPO | grep $ARCHIVE_DATE | awk '{print $1}')
 
-# Verifica se o arquivo de backup foi encontrado
+# Check if the backup file was found
 if [ -z "$ARCHIVE_NAME" ]
 then
-    echo "Não foi possível encontrar um arquivo de backup para a data especificada: $ARCHIVE_DATE"
+    echo "Could not find a backup file for the specified date: $ARCHIVE_DATE"
     exit 1
 fi
 
-# Função para mensagens de erro
+# Error message function
 errorecho() { cat <<< "$@" 1>&2; } 
 
-# Cria as pastas necessarias
+# Create the necessary folders
 
 mkdir /mnt/rclone/Borg /var/log/Rclone /var/log/Borg
 
-# Monte o Rclone
+# Mount Rclone
 
 sudo systemctl start Backup.service
 
-# Restaura o backup do Nextcloud 
-# 
-echo "Restaurando backup das configurações do Nextcloud" >> $RESTLOGFILE_PATH
-
-# Ativando Modo de Manutenção
-
-echo
-sudo nextcloud.occ maintenance:mode --on >> $RESTLOGFILE_PATH
-echo 
-
-# Extraia os Arquivos
-
-borg extract -v --list $BORG_REPO::$ARCHIVE_NAME $NEXTCLOUD_CONF >> $RESTLOGFILE_PATH 2>&1
-
-echo
-echo "DONE!"
-
-# Verifique se o arquivo de backup existe
+# Check if the backup file exists
 if [ -z "RESTORE_FILE" ]; then
-    echo "Nenhum arquivo de backup encontrado"
+    echo "No backup file found"
     exit 1
 fi
+
+# Activate Maintenance Mode
+
+echo
+sudo nextcloud.occ maintenance:mode --on >> $LOGFILE_PATH
+echo 
+
+# Restore Nextcloud settings 
+# 
+echo "Restoring Nextcloud settings backup" >> $RESTLOGFILE_PATH
+
+borg extract -v --list $BORG_REPO::$ARCHIVE_NAME $NEXTCLOUD_CONF >> $RESTLOGFILE_PATH 2>&1
 
 sudo nextcloud.import -abc $RESTORE_FILE >> $RESTLOGFILE_PATH
 
 echo
 echo "DONE!"
 
-# Restaura a pasta ./data Nextcloud.
-# Útil se a pasta ./data estiver fora de /var/snap/nextcloud/common caso contrario recomendo comentar a linha abaixo, pois seu servidor já estará restaurado com o comando acima. 
+# Restore the ./data Nextcloud folder.
+# Useful if the ./data folder is outside /var/www/nextcloud; otherwise, it is recommended to comment out the line below as your server will already be restored with the above command. 
 # 
-echo "Restaurando backup da pasta ./data" >> $RESTLOGFILE_PATH
+echo "Restoring ./data folder backup" >> $RESTLOGFILE_PATH
 
 borg extract -v --list $BORG_REPO::$ARCHIVE_NAME $NEXTCLOUD_DATA >> $RESTLOGFILE_PATH 2>&1
 
 echo
 echo "DONE!"
 
-# Restaura as permissões 
+# Restore permissions 
 
 chmod -R 770 $NEXTCLOUD_DATA 
 chown -R root:root $NEXTCLOUD_DATA
 chown -R root:root $NEXTCLOUD_CONF
 
-# Desativando Modo de Manutenção Nextcloud
+# For NTFS and FAT32 file systems, among others that do not accept permissions, it is advisable to add an entry in your /etc/fstab file. Uncomment the line below and change the UUID /mnt/YOURHD and the ntfs-3g field.
+# To find the UUID of your partition or HDD, execute the command sudo blkid. 
 
-echo  
-sudo nextcloud.occ maintenance:mode --off >> $RESTLOGFILE_PATH
-echo
+#cp /etc/fstab /etc/fstab.bk
+#sudo cat <<EOF >>/etc/fstab
+#UUID=089342544239044F /mnt/YOURHD ntfs-3g utf8,uid=www-data,gid=www-data,umask=0007,noatime,x-gvfs-show 0 0
+#EOF
 
 echo
 echo "DONE!"
 
-# Restaura as configurações do Emby 
+# Deactivate Maintenance Mode for Nextcloud
 
-echo "Restaurando backup Emby" >> $RESTLOGFILE_PATH
+echo
+sudo nextcloud.occ maintenance:mode --off >> $LOGFILE_PATH
+echo
 
-# Pare o Emby
+
+# Restore Emby Server settings
+
+echo "Restoring Emby backup" >> $RESTLOGFILE_PATH
+
+# Stop Emby
 
 sudo systemctl stop emby-server.service
 
-# Remova a Pasta atual do Emby
+# Remove the current Emby folder
 
 rm -rf $EMBY_CONF
 
-# Extraia os arquivos
+# Extract Files
 
 borg extract -v --list $BORG_REPO::$ARCHIVE_NAME $EMBY_CONF >> $RESTLOGFILE_PATH 2>&1
 
-# Restaura as permissões
+# Restore permissions
 
 chmod -R 755 $EMBY_CONF
 chown -R emby:emby $EMBY_CONF
 
-# Adicione o Usuário Emby ao grupo root para acessar as pastas do Nextcloud
+# Add the Emby User to the root group to access Nextcloud folders
 
 sudo adduser emby root
 
-# Inicie o Emby
+# Start Emby
 
 sudo systemctl start emby-server.service
-
-echo
-echo "DONE!"
-
-# Para sistemas de arquivos NTFS e FAT32 entre outros que não aceitam permissões convêm adicionar uma entrada em seu arquivo /etc/fstab para isso descomente a linha abaixo e altere o UUID /mnt/SEUHD e o campo ntfs-3g.
-# Para encontrar o UUID de sua partição ou HD execute o comando sudo blkid. 
-
-#cp /etc/fstab /etc/fstab.bk
-#sudo cat <<EOF >>/etc/fstab
-#UUID=089342544239044F /mnt/SEUHD ntfs-3g utf8,uid=root,gid=root,umask=0007,noatime,x-gvfs-show 0 0
-#EOF
 
 echo
 echo "DONE!"
