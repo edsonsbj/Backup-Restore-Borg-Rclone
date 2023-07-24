@@ -1,4 +1,4 @@
-Translate the text "#!/bin/bash
+#!/bin/bash
 
 CONFIG="/path/to/.conf"
 . $CONFIG
