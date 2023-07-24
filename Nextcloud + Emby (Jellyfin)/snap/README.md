@@ -1,97 +1,104 @@
 # **Nextcloud snap + Emby (jellyfin)**
 
-Este diretório contém um script que realiza o backup e a restauração de sua instância Nextcloud, incluindo a pasta de dados, bem como as configurações do servidor Emby ou Jellyfin. O backup é feito usando o Borg Backup e a montagem Rclone para armazenar seus backups em um serviço de nuvem de sua escolha.
+This directory contains a script that performs the backup and restoration of your Nextcloud instance, including the data folder, as well as the Emby or Jellyfin server settings. The backup is done using Borg Backup and Rclone mount to store your backups in a cloud service of your choice.
 
-## Início
+## Getting Started
 
-- Certifique-se de que o `Nextcloud` já está instalado e funcionando corretamente.
-- Verifique se o `Emby` ou `Jellyfin` já está instalado em seu sistema.
-- Verifique se os programas `rclone`, `borg` e `git` já estão instalados em seu sistema.
-- Clone este repositório usando o comando `git clone https://github.com/edsonsbj/Backup-Restore-Borg-Rclone.git`.
+- Ensure that `Nextcloud` is already installed and working correctly.
+- Check if `Emby` or `Jellyfin` is already installed on your system.
+- Verify that the programs `rclone`, `borg`, and `git` are already installed on your system.
+- Clone this repository using the command `git clone https://github.com/edsonsbj/Backup-Restore-Borg-Rclone.git`.
 
 ## Backup
 
-1. Faça uma cópia do arquivo `example.conf` e renomeie-o de acordo com suas necessidades.
-2. Adicione as pastas que deseja fazer backup no arquivo `patterns.lst`. Por padrão, o arquivo já está pré-configurado para fazer backup das pastas do `Nextcloud`, incluindo a pasta de dados, excluindo a lixeira e também a pasta de configuração do `Emby`.
-3. Defina as variáveis no arquivo `.conf` para corresponder às suas necessidades.
-4. Opcionalmente, mova os arquivos `backup.sh`, `patterns.lst`, `restore.sh` e o arquivo `.conf` recém-editado para uma pasta de sua preferência.
-5. Torne os scripts executáveis usando o comando `sudo chmod +x`.
-6. Substitua os valores `--config=/path/user/rclone.conf` e `Borg:`/ no arquivo `Backup.service` pelas configurações apropriadas, onde `--config` corresponde ao local do seu arquivo `rclone.conf` e `Borg:/` corresponde ao seu remoto (nuvem) a ser montado.
-7. Mova o `Backup.service` para a pasta `/etc/systemd/system/`.
-8. Execute o script `./backup.sh` ou crie um novo trabalho no Cron usando o comando `crontab -e`, conforme exemplo abaixo:
+1. Make a copy of the `example.conf` file and rename it according to your needs.
+2. Add the folders you want to back up in the `patterns.lst` file. By default, the file is already pre-configured to back up the `Nextcloud` folders, including the data folder, excluding the trash bin, and also the `Emby` configuration folder.
+3. Set the variables in the `.conf` file to match your needs.
+4. Optionally, move the `backup.sh`, `patterns.lst`, `restore.sh`, and the edited `.conf` file to a folder of your choice.
+5. Make the scripts executable using the command `sudo chmod +x`.
+6. Replace the values `--config=/path/user/rclone.conf` and `Borg:`/ in the `Backup.service` file with the appropriate configurations, where `--config` corresponds to the location of your `rclone.conf` file and `Borg:/` corresponds to your remote (cloud) to be mounted.
+7. Move the `Backup.service` to the `/etc/systemd/system/` folder.
+8. Run the script `./backup.sh` or create a new Cron job using the `crontab -e` command, as shown below:
 
 ````
 00 00 * * * sudo ./backup.sh
 ````
 
-## **Jellyfin em vez do Emby**
+## **Jellyfin instead of Emby**
 
-Se você optou por usar o `Jellyfin` em vez do `Emby`, execute os comandos abaixo
+If you chose to use `Jellyfin` instead of `Emby`, execute the commands below:
 
-1. Comente as linhas referente ao emby no arquivo `patterns.lst`.
-````
+1. Comment the lines referring to Emby in the `patterns.lst` file:
+
+```
 sudo sed -i '8,13s/^/# /g' "/path/to/patterns.lst"
-````
-2. Descomente a linha referente ao Jellyfin no arquivo `patterns.lst`.
-````
+```
+
+2. Uncomment the line referring to Jellyfin in the `patterns.lst` file:
+
+```
 sudo sed -i '16s/^# //' "/path/to/patterns.lst"
-````
-3. Altera a variável `EMBY_CONF` para corresponder ao caminho das configurações do Jellyfin no arquivo ``example.conf`.
-````
+```
+
+3. Change the `EMBY_CONF` variable to match the path of the Jellyfin settings in the `example.conf` file:
+
+```
 sudo sed -i "s/\EMBY_CONF=\"\/var\/lib\/emby\"/\$EMBY_CONF=\"\/var\/lib\/jellyfin\"/g" "/path/to/patterns.lst"
-````
-4. Faça as alterações necessarias no script `backup.sh` e `restore.sh`.
-````
+```
+
+4. Make the necessary changes to the `backup.sh` and `restore.sh` scripts.
+
+```
 sudo sed -i 's/emby-server.service/jellyfin.service/g' "/path/to/backup.sh"
 sudo sed -i 's/chown -R emby:emby/chown -R jellyfin:jellyfin/g' "/path/to/restore.sh"
 sudo sed -i 's/sudo adduser emby www-data/sudo adduser jellyfin www-data/g' "/path/to/restore.sh"
 sudo sed -i 's/emby-server.service/jellyfin.service/g' "/path/to/restore.sh"
-````
+```
 
-## **Restauração**
+## **Restoration**
 
-Opções de Restauração:
+Restoration options:
 
-### **Restaure todo o Servidor**
+### **Restore the Entire Server**
 
-Restaura todos os arquivos
+Restores all files.
 
-- Execute o script com a data desejada do backup a ser restaurado.
+- Run the script with the desired backup date to be restored.
 
 ```
 ./restore.sh 2023-07-15
 ```
 
-### **Restaure o Nextcloud**
+### **Restore Nextcloud**
 
-Para restaurar somente Nextcloud, siga as instruções abaixo.
+To restore only Nextcloud, follow the instructions below.
 
-- Em seu arquivo `restore.sh` comente o intervalo de linhas abaixo.
+- In your `restore.sh` file, comment out the lines below.
 
 ```
-# Restaura as configurações do Emby 
+# Restore Emby settings
 
- echo "Restaurando backup Emby" >> $RESTLOGFILE_PATH
+echo "Restoring Emby backup" >> $RESTLOGFILE_PATH
 
-# Pare o Emby
+# Stop Emby
 
 sudo systemctl stop emby-server.service
 
-# Mova a pasta atual do Emby
+# Move the current Emby folder
 rm -rf $EMBY_CONF
 
 borg extract -v --list $BORG_REPO::$ARCHIVE_NAME $EMBY_CONF >> $RESTLOGFILE_PATH 2>&1
 
-# Restaura as permissões
+# Restore permissions
 
 chmod -R 755 $EMBY_CONF
 chown -R emby:emby $EMBY_CONF
 
-# Adicione o Usuário Emby ao grupo www-data para acessar as pastas do Nextcloud
+# Add Emby User to www-data group to access Nextcloud folders
 
 sudo adduser emby root
 
-# Inicie o Emby
+# Start Emby
 
 sudo systemctl start emby-server.service
 
@@ -99,23 +106,23 @@ echo
 echo "DONE!"
 ```
 
-- Execute o script com a data desejada do backup a ser restaurado.
+- Run the script with the desired backup date to be restored.
 
 ```
 ./restore.sh 2023-07-15
 ```
 
-### **Restaure as Configurações**
+### **Restore Settings**
 
-Esta opção ira restaurar somente as configurações do Nextcloud. Util se a pasta data estiver em outro local.
+This option will restore only Nextcloud settings. Useful if the data folder is in another location.
 
-- Em seu arquivo restore.sh comente o intervalo de linhas abaixo.
+- In your `restore.sh` file, comment out the lines below.
 
  ```
-# Restaura a pasta ./data Nextcloud.
-# Útil se a pasta ./data estiver fora de /var/snap/nextcloud/common caso contrario recomendo comentar a linha abaixo, pois seu servidor já estará restaurado com o comando acima. 
+# Restore Nextcloud data folder.
+# Useful if the data folder is outside of /var/snap/nextcloud/common, otherwise, I recommend commenting the line below since your server will already be restored with the command above. 
 # 
-echo "Restaurando backup da pasta ./data" >> $RESTLOGFILE_PATH
+echo "Restoring data folder backup" >> $RESTLOGFILE_PATH
 
 borg extract -v --list $BORG_REPO::$ARCHIVE_NAME $NEXTCLOUD_DATA >> $RESTLOGFILE_PATH 2>&1
 
@@ -123,28 +130,28 @@ echo
 echo "DONE!"
 ```
 
-- Execute o script com a data desejada do backup a ser restaurado.
+- Run the script with the desired backup date to be restored.
 
 ```
 ./restore.sh 2023-07-15
 ```
 
-### **Restaure Nextcloud/data**
+### **Restore Nextcloud/data**
 
-Para restaurar somente a pasta ./data, siga as instruções abaixo.
+To restore only the data folder, follow the instructions below.
 
-- Em seu arquivo `restore.sh` comente o intervalo de linhas abaixo. 
+- In your `restore.sh` file, comment out the lines below. 
 
 ```
-# Restaura as configurações do Nextcloud 
+# Restore Nextcloud settings 
 # 
-echo "Restaurando backup das configurações do Nextcloud" >> $RESTLOGFILE_PATH
+echo "Restoring Nextcloud settings backup" >> $RESTLOGFILE_PATH
 
 borg extract -v --list $BORG_REPO::$ARCHIVE_NAME $NEXTCLOUD_CONF >> $RESTLOGFILE_PATH 2>&1
 
-# Verifique se o arquivo de backup existe
+# Check if the backup file exists
 if [ -z "RESTORE_FILE" ]; then
-    echo "Nenhum arquivo de backup encontrado"
+    echo "No backup file found"
     exit 1
 fi
 
@@ -154,64 +161,66 @@ echo
 echo "DONE!"
 ```
 
-- Execute o script com a data desejada do backup a ser restaurado.
+- Run the script with the desired backup date to be restored.
 
 ```
 ./restore.sh 2023-07-15
 ```
 
-### **Restaure o Emby**
+### **Restore Emby**
 
-Para restaurar somente as configurações do Emby, siga as instruções abaixo.
+To restore only the Emby settings, follow the instructions below.
 
-- Em seu arquivo `restore.sh` comente o intervalo de linhas abaixo.
+- In your `restore.sh` file, comment out the lines below.
 
 ```
-# Restaura o backup do Nextcloud 
+# Restore Nextcloud backup 
 # 
-echo "Restaurando backup das configurações do Nextcloud" >> $RESTLOGFILE_PATH
+echo "Restoring Nextcloud settings backup" >> $RESTLOGFILE_PATH
 
-# Ativando Modo de Manutenção
+# Enable Maintenance Mode
 
 echo
 sudo nextcloud.occ maintenance:mode --on >> $RESTLOGFILE_PATH
 echo 
 
-# Extraia os Arquivos
+# Extract Files
 
 borg extract -v --list $BORG_REPO::$ARCHIVE_NAME $NEXTCLOUD_CONF >> $RESTLOGFILE_PATH 2>&1
 
 echo
 echo "DONE!"
 
-# Verifique se o arquivo de backup existe
+# Check if the backup file exists
 if [ -z "RESTORE_FILE" ]; then
-    echo "Nenhum arquivo de backup encontrado"
+    echo "No backup file found"
     exit 1
 fi
 
-sudo nextcloud.import -abc $RESTORE_FILE >> $RESTLOGFILE_PATH
+sudo nextcloud.import -
+
+abc $RESTORE_FILE >> $RESTLOGFILE_PATH
 
 echo
 echo "DONE!"
 
-# Restaura a pasta ./data Nextcloud.
-# Útil se a pasta ./data estiver fora de /var/snap/nextcloud/common caso contrario recomendo comentar a linha abaixo, pois seu servidor já estará restaurado com o comando acima. 
+# Restore Nextcloud data folder.
+# Useful if the data folder is outside of /var/snap/nextcloud/common, otherwise, I recommend commenting the line below since your server will already be restored with the command above. 
 # 
-echo "Restaurando backup da pasta ./data" >> $RESTLOGFILE_PATH
+echo "Restoring data folder backup" >> $RESTLOGFILE_PATH
 
 borg extract -v --list $BORG_REPO::$ARCHIVE_NAME $NEXTCLOUD_DATA >> $RESTLOGFILE_PATH 2>&1
 
 echo
 echo "DONE!"
 
-# Restaura as permissões 
+# Restore permissions 
 
 chmod -R 770 $NEXTCLOUD_DATA 
 chown -R root:root $NEXTCLOUD_DATA
 chown -R root:root $NEXTCLOUD_CONF
 
-# Desativando Modo de Manutenção Nextcloud
+# Disable Nextcloud Maintenance Mode
 
 echo  
 sudo nextcloud.occ maintenance:mode --off >> $RESTLOGFILE_PATH
@@ -221,66 +230,64 @@ echo
 echo "DONE!"
 ```
 
-- Execute o script com a data desejada do backup a ser restaurado.
+- Run the script with the desired backup date to be restored.
 
 ```
 ./restore.sh 2023-07-15
 ```
 
-### **Restaure os dados em Mídia removível**
+### **Restoring data on removable media**
 
-- Altere as variáveis `DEVICE` e `MOUNTDIR` `NEXTCLOUD_DATA` em seu arquivo `.conf`.
-- Em seu arquivo `restore.sh` descomente as linhas a seguir. 
+- Change the variables `DEVICE` and `MOUNTDIR` in your `.conf` file `NEXTCLOUD_DATA`.
+- In your `restore.sh` file, uncomment the following lines. 
  ```
-# NÃO ALTERE
+# DO NOT CHANGE
 # MOUNT_FILE="/proc/mounts"
 # NULL_DEVICE="1> /dev/null 2>&1"
 # REDIRECT_LOG_FILE="1>> $LOGFILE_PATH 2>&1" 
 
-# O Dispositivo está Montado?
+# Is the Device Mounted?
 # grep -q "$DEVICE" "$MOUNT_FILE"
 # if [ "$?" != "0" ]; then
-# Se não, monte em $MOUNTDIR
-#  echo " Dispositivo não montado. Monte $DEVICE " >> $LOGFILE_PATH
+# If not, mount it at $MOUNTDIR
+#  echo " Device not mounted. Mount $DEVICE " >> $LOGFILE_PATH
 #  eval mount -t auto "$DEVICE" "$MOUNTDIR" "$NULL_DEVICE"
 #else
-# Se sim, grep o ponto de montagem e altere o $MOUNTDIR
+# If yes, grep the mount point and change the $MOUNTDIR
 #  DESTINATIONDIR=$(grep "$DEVICE" "$MOUNT_FILE" | cut -d " " -f 2)
 #fi
-# Há permissões de excrita e gravação?
+# Are there write and read permissions?
 # [ ! -w "$MOUNTDIR" ] && {
-#  echo " Não tem permissões de gravação " >> $LOGFILE_PATH
+#  echo " No write permissions " >> $LOGFILE_PATH
 #  exit 1
 # }
 ```
 
-### **Para Partições e Mídias em formato NTFS exFAT e FAT32**
+### **For NTFS exFAT and FAT32 Partitions and Media**
 
-### Para partições e mídias em formato NTFS exFAT e FAT32
-
-1. Adicione a seguinte entrada no arquivo `/etc/fstab`:
+1. Add the following entry in the `/etc/fstab` file:
 
 ```
 UUID=089342544239044F /mnt/Multimidia ntfs-3g utf8,uid=root,gid=root,umask=0007,noatime,x-gvfs-show 0 0
 ```
 
-2. Altere o `UUID` para corresponder ao `UUID` da unidade que será montada. Para encontrar o `UUID` correto, execute o comando `sudo blkid`.
-3. Altere `/mnt/Multimidia` para o ponto de montagem de sua preferência. Se o ponto de montagem não existir, crie-o usando o comando `sudo mkdir /mnt/seu_pontodemontagem`.
-4. Altere `ntfs-3g` para o formato de partição desejado, como exFAT ou FAT32.
-5. Execute o comando `sudo mount -a` para montar a unidade.
-6. Se ocorrer algum erro ao executar o comando acima, instale os pacotes `ntfs-3g` para partições `NTFS` ou `exfat-fuse` e `exfat-utils` para partições `exFAT`.
+2. Change the `UUID` to match the `UUID` of the drive to be mounted. To find the correct `UUID`, run the `sudo blkid` command.
+3. Change `/mnt/Multimidia` to the mount point of your choice. If the mount point does not exist, create it using the command `sudo mkdir /mnt/your_mount_point`.
+4. Change `ntfs-3g` to the desired partition format, such as exFAT or FAT32.
+5. Run the command `sudo mount -a` to mount the drive.
+6. If there are any errors when running the command above, install the `ntfs-3g` package for `NTFS` partitions or `exfat-fuse` and `exfat-utils` packages for `exFAT` partitions.
 
-## Algumas observações importantes
+## Some important notes
 
-- É altamente recomendável desmontar a unidade local onde foi efetuado o backup após a conclusão do processo. Para isso, crie um agendamento no Cron para desmontar a unidade em um intervalo de 3 horas após o início do backup. Por exemplo:
+- It is highly recommended to unmount the local drive where the backup was made after the process is completed. To do this, create a schedule in Cron to unmount the drive within 3 hours after starting the backup. For example:
 
 ```
 00 00 * * * sudo ./backup.sh
 00 03 * * * sudo systemctl stop backup.service
 ```
 
-Isso garantirá que o Rclone tenha tempo suficiente para completar o upload dos arquivos para a nuvem antes de desmontar a unidade.
+This will ensure that Rclone has enough time to complete the upload of files to the cloud before unmounting the drive.
 
-## Testes
+## Tests
 
-Em testes realizados, o tempo decorrido para o backup e restauração foi semelhante ao de outras ferramentas como `Duplicity` ou `Deja-Dup`.
+In conducted tests, the elapsed time for backup and restoration was similar to other tools such as `Duplicity` or `Deja-Dup`.
