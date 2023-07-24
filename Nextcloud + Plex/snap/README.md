@@ -46,7 +46,7 @@ sudo sed -i "s/PLEX_CONF=\"\/var\/lib\/plexmediaserver\/Library\/Application Sup
 ```
 sudo sed -i 's/systemctl start plexmediaserver/snap start plexmediaserver/g' "/path/to/backup.sh"
 sudo sed -i 's/systemctl stop plexmediaserver/snap stop plexmediaserver/g' "/path/to/backup.sh"
-sudo sed -i 's/chown -R plex:plex/chown -R root:root/g' "/path/to/restore.sh""
+sudo sed -i 's/chown -R plex:plex/chown -R root:root/g' "/path/to/restore.sh"
 sudo sed -i 's/systemctl start plexmediaserver/snap start plexmediaserver/g' "/path/to/restore.sh"
 sudo sed -i 's/systemctl stop plexmediaserver/snap stop plexmediaserver/g' "/path/to/restore.sh"
 ```

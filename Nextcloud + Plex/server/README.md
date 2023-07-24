@@ -2,7 +2,7 @@
 
 This directory contains a script that performs the backup and restoration of your Nextcloud instance, including the data folder, as well as the PLEX server settings. The backup is done using Borg Backup and Rclone mount to store your backups in a cloud service of your choice.
 
-## Start
+## Getting Started
 
 - Make sure that `Nextcloud` is already installed and working properly.
 - Check if `PLEX` is already installed on your system.
