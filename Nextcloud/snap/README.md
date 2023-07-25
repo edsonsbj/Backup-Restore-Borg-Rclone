@@ -4,6 +4,14 @@ This directory contains a script that performs backup and restoration of your Ne
 
 ## Contents <!-- omit in toc -->
 - [Getting Started](#Getting-Started)
+- [Backup](#Backup)
+- [Restore the Entire Server](#Restore-the-Entire-Server)
+- [Restore Settings](#Restore-Settings)
+- [Restore Nextcloud/data](#Restore-Nextcloud/data)
+- [Restore Data on Removable Media](#Restore-Data-on-Removable-Media)
+- [For NTFS, exFAT, and FAT32 formatted partitions and media](#For-NTFS,-exFAT,-and-FAT32-formatted-partitions-and-media)
+- [Some important notes](#Some important notes)
+- [Testing](#Testing)
 
 ## Getting Started
 
