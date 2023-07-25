@@ -3,7 +3,7 @@
 This directory contains a script that performs backup and restoration of your Nextcloud instance, including the data folder. The backup is done using Borg Backup and Rclone mounting to store your backups in a cloud service of your choice.
 
 ## Contents <!-- omit in toc -->
-- [Getting Started](#Getting Started)
+- [Getting Started](#Getting-Started)
 
 ## Getting Started
 
