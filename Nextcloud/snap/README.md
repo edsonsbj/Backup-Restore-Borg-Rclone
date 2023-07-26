@@ -139,7 +139,7 @@ echo "DONE!"
 ```
 UUID=089342544239044F /mnt/Multimidia ntfs-3g utf8,uid=root,gid=root,umask=0007,noatime,x-gvfs-show 0 0
 ```
-details>
+<details>
 <summary>Click here to expand</summary>
 
 2. Change the `UUID` to match the `UUID` of the drive to be mounted. To find the correct `UUID`, run the command `sudo blkid`.
