@@ -34,10 +34,12 @@ This directory contains a script that performs backup and restoration of your Ne
 ```
 00 00 * * * sudo ./backup.sh
 ```
+<details>
+<summary>Restoration options</summary>
+## **Restoratio**n
 
-## **Restoration**
-
-Restoration options:
+<details>
+<summary>Restoration options</summary>
 
 ### **Restore the Entire Server**
 
@@ -147,6 +149,8 @@ UUID=089342544239044F /mnt/Multimidia ntfs-3g utf8,uid=root,gid=root,umask=0007,
 4. Change `ntfs-3g` to the desired partition format, such as exFAT or FAT32.
 5. Run the command `sudo mount -a` to mount the drive.
 6. If there's an error executing the above command, install the `ntfs-3g` package for `NTFS` partitions or `exfat-fuse` and `exfat-utils` for `exFAT` partitions.
+</details>
+
 </details>
 
 ## Some important notes
