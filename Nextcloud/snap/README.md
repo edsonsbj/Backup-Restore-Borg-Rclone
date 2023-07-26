@@ -36,9 +36,8 @@ This directory contains a script that performs backup and restoration of your Ne
 ```
 ## **Restoration**
 
-<details>
-<summary>Restoration options</summary>
-
+  Restoration options: 
+  
 ### **Restore the Entire Server**
 
 Restore all files.
