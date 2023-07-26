@@ -34,9 +34,7 @@ This directory contains a script that performs backup and restoration of your Ne
 ```
 00 00 * * * sudo ./backup.sh
 ```
-<details>
-<summary>Restoration options</summary>
-## **Restoratio**n
+## **Restoration**
 
 <details>
 <summary>Restoration options</summary>
