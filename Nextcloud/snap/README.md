@@ -147,6 +147,7 @@ UUID=089342544239044F /mnt/Multimidia ntfs-3g utf8,uid=root,gid=root,umask=0007,
 4. Change `ntfs-3g` to the desired partition format, such as exFAT or FAT32.
 5. Run the command `sudo mount -a` to mount the drive.
 6. If there's an error executing the above command, install the `ntfs-3g` package for `NTFS` partitions or `exfat-fuse` and `exfat-utils` for `exFAT` partitions.
+</details>
 
 ## Some important notes
 
