@@ -5,7 +5,8 @@ This directory contains a script that performs backup and restoration of your Ne
 ## Contents <!-- omit in toc -->
 - [Getting Started](#Getting-Started)
 - [Backup](#Backup)
-- [Restoration](#Restoration)
+<details>
+<summary>- [Restoration](#Restoration)</summary>
   - [Restore the Entire Server](#Restore-the-Entire-Server)
   - [Restore Settings](#Restore-Settings)
   - [Restore Nextcloud/data](#Restore-Nextclouddata)
