@@ -3,18 +3,18 @@
 This directory contains a script that performs the backup and restoration of your Nextcloud instance, including the data folder, as well as the PLEX server settings. The backup is done using Borg Backup and Rclone mount to store your backups in a cloud service of your choice.
 
 ## Contents <!-- omit in toc -->
-- [Getting Started](#Getting-Started)
-- [Backup](#Backup)
-- [PLEX Installation through Snap Packages](#PLEX-Installation-through-Snap-Packages)
-- [Restore the Entire Server](#Restore-the-Entire-Server)
-- [Restore Nextcloud](#Restore-Nextcloud)
-- [Restore Settings](#Restore-Settings)
-- [Restore Nextcloud/data](#Restore-Nextclouddata)
-- [Restore PLEX](#Restore-PLEX)
-- [Restore Data on Removable Media](#Restore-Data-on-Removable-Media)
-  - [For NTFS, exFAT, and FAT32 formatted partitions and media](#For-NTFS-exFAT-and-FAT32-formatted-partitions-and-media)
-- [Some important notes](#Some-important-notes)
-- [Testing](#Testing)
+  - [Getting Started](#Getting-Started)
+  - [Backup](#Backup)
+  - [PLEX Installation through Snap Packages](#PLEX-Installation-through-Snap-Packages)
+  - [Restore the Entire Server](#Restore-the-Entire-Server)
+  - [Restore Nextcloud](#Restore-Nextcloud)
+  - [Restore Settings](#Restore-Settings)
+  - [Restore Nextcloud/data](#Restore-Nextclouddata)
+  - [Restore PLEX](#Restore-PLEX)
+  - [Restore Data on Removable Media](#Restore-Data-on-Removable-Media)
+    - [For NTFS, exFAT, and FAT32 formatted partitions and media](#For-NTFS-exFAT-and-FAT32-formatted-partitions-and-media)
+  - [Some important notes](#Some-important-notes)
+  - [Testing](#Testing)
 
 ## Getting Started
 
