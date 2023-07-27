@@ -35,11 +35,10 @@ This directory contains a script that performs backup and restoration of your Ne
 ```
 00 00 * * * sudo ./backup.sh
 ```
-
 ## **Restoration**
 
-Restoration options:
-
+  Restoration options: 
+  
 ### **Restore the Entire Server**
 
 Restore all files.
@@ -140,12 +139,17 @@ echo "DONE!"
 ```
 UUID=089342544239044F /mnt/Multimidia ntfs-3g utf8,uid=root,gid=root,umask=0007,noatime,x-gvfs-show 0 0
 ```
+<details>
+<summary>Click here to expand</summary>
 
 2. Change the `UUID` to match the `UUID` of the drive to be mounted. To find the correct `UUID`, run the command `sudo blkid`.
 3. Change `/mnt/Multimidia` to your preferred mount point. If the mount point doesn't exist, create it using the command `sudo mkdir /mnt/your_mount_point`.
 4. Change `ntfs-3g` to the desired partition format, such as exFAT or FAT32.
 5. Run the command `sudo mount -a` to mount the drive.
 6. If there's an error executing the above command, install the `ntfs-3g` package for `NTFS` partitions or `exfat-fuse` and `exfat-utils` for `exFAT` partitions.
+</details>
+
+</details>
 
 ## Some important notes
 
