@@ -5,7 +5,7 @@ This directory contains a script that performs the backup and restoration of you
 ## Contents <!-- omit in toc -->
 - [Getting Started](#Getting-Started)
 - [Backup](#Backup)
-- [Installation of PLEX through Snap packages](#Installation-of-PLEX-through-Snap-packages)
+- [PLEX Installation through Snap Packages](#PLEX-Installation-through-Snap-Packages)
 - [Restore the Entire Server](#Restore-the-Entire-Server)
 - [Restore Nextcloud](#Restore-Nextcloud)
 - [Restore Settings](#Restore-Settings)
