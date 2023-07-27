@@ -35,26 +35,6 @@ This directory contains a script that performs the backup and restoration of you
 8. Move the `Backup.service` to the `/etc/systemd/system/` folder.
 9. Execute the script `./backup.sh` or create a new Cron job using the command `crontab -e`, following the example below:
 
-
-
-## Getting Started
-
-- Ensure that `Nextcloud` is already installed and working correctly.
-- Verify that `PLEX` is installed on your system.
-- Check if the programs `rclone`, `borg`, and `git` are installed on your system.
-- Clone this repository using the command `git clone https://github.com/edsonsbj/Backup-Restore-Borg-Rclone.git`.
-
-## Backup
-
-1. Make a copy of the `example.conf` file and rename it according to your needs.
-2. Add the folders you want to back up to the `patterns.lst` file. By default, the file is already pre-configured to back up the `Nextcloud` folders, including the data folder, excluding the trash, and also the `PLEX` configuration folder.
-3. Set the variables in the `.conf` file to match your needs.
-4. Optionally, move the files `backup.sh`, `patterns.lst`, `restore.sh`, and the edited `.conf` file to a folder of your preference.
-5. Make the scripts executable using the command `sudo chmod +x`.
-6. Replace the values `--config=/path/user/rclone.conf` and `Borg:/` in the `Backup.service` file with the appropriate settings, where `--config` corresponds to the location of your `rclone.conf` file and `Borg:/` corresponds to your remote (cloud) to be mounted.
-7. Move the `Backup.service` to the folder `/etc/systemd/system/`.
-8. Execute the script `./backup.sh` or create a new job in Cron using the command `crontab -e`, as shown below:
-
 ```
 00 00 * * * sudo ./backup.sh
 ```
