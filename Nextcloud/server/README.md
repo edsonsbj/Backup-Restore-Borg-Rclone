@@ -2,22 +2,35 @@
 
 This directory contains a script that performs the backup and restoration of your Nextcloud instance, including the data folder. The backup is done using Borg Backup and Rclone mount to store your backups in a cloud service of your choice.
 
+## Contents <!-- omit in toc -->
+- [Getting Started](#Getting-Started)
+- [Backup](#Backup)
+- [Restoration](#Restoration)
+  - [Restore the Entire Server](#Restore-the-Entire-Server)
+  - [Restore Settings](#Restore-Settings)
+  - [Restore Nextcloud/data](#Restore-Nextclouddata)
+  - [Restore Data on Removable Media](#Restore-Data-on-Removable-Media)
+    - [For NTFS, exFAT, and FAT32 formatted partitions and media](#For-NTFS-exFAT-and-FAT32-formatted-partitions-and-media)
+- [Some important notes](#Some-important-notes)
+- [Testing](#Testing)
+
 ## Getting Started
 
-- Make sure that `Nextcloud` is already installed and working properly.
-- Check if the programs `rclone`, `borg` and `git` are already installed on your system.
+- Make sure that `Nextcloud` is already installed and working correctly.
+- Ensure that the programs `rclone`, `borg`, and `git` are installed on your system.
 - Clone this repository using the command `git clone https://github.com/edsonsbj/Backup-Restore-Borg-Rclone.git`.
 
 ## Backup
 
-1. Make a copy of the file `example.conf` and rename it according to your needs.
-2. Add the folders you want to backup in the file `patterns.lst`. By default, the file is already pre-configured to backup the `Nextcloud` folders, including the data folder, excluding the trash bin.
-3. Set the variables in the `.conf` file to match your needs.
-4. Optionally, move the files `backup.sh`, `patterns.lst`, `restore.sh` and the newly edited `.conf` file to a folder of your preference.
-5. Make the scripts executable using the command `sudo chmod +x`.
-6. Replace the values `--config=/path/user/rclone.conf` and `Borg:`/ in the file `Backup.service` with the appropriate settings, where `--config` corresponds to the location of your `rclone.conf` file and `Borg:/` corresponds to your remote (cloud) to be mounted.
-7. Move the `Backup.service` to the folder `/etc/systemd/system/`.
-8. Run the script `./backup.sh` or create a new job in Cron using the command `crontab -e`, as shown below:
+1. Make a copy of the `example.conf` file and rename it according to your needs.
+2. Add the folders you want to back up to the `patterns.lst` file. By default, the file is pre-configured to back up the `Nextcloud` folders, including the data folder, excluding the trash.
+3. Set the variables in the `.conf` file to match your requirements.
+4. Change the `CONFIG=”/path/to/.conf"` field in the `backup.sh` and `restore.sh` files to match the path to your `.conf` file.
+5. Optionally, move the `backup.sh`, `patterns.lst`, `restore.sh`, and the newly edited `.conf` file to a folder of your preference.
+6. Make the scripts executable using the command `sudo chmod +x`.
+7. Replace the values `--config=/path/user/rclone.conf` and `Borg:` in the `Backup.service` file with appropriate settings, where `--config` corresponds to the location of your `rclone.conf` file, and `Borg:/` corresponds to your remote (cloud) to be mounted.
+8. Move the `Backup.service` to the `/etc/systemd/system/` folder.
+9. Execute the script `./backup.sh` or create a new Cron job using the command `crontab -e`, following the example below:
 
 ```
 00 00 * * * sudo ./backup.sh

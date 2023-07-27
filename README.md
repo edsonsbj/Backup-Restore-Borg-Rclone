@@ -13,10 +13,11 @@ This repository contains scripts for performing backup and restoration tasks usi
 2. Add the folders you wish to back up to the `patterns.lst` file.
 3. Set the variables in the `.conf` file to match your requirements.
 4. Optionally, move the `backup.sh`, `patterns.lst`, `restore.sh`, and the newly edited `.conf` file to a folder of your preference.
-5. Make the scripts executable using the command `sudo chmod +x`.
-6. Replace the values `--config=/path/user/rclone.conf` and `Borg:` in the `Backup.service` file with appropriate settings, where `--config` corresponds to the location of your `rclone.conf` file, and `Borg:/` corresponds to your remote (cloud) to be mounted.
-7. Move the `Backup.service` to the `/etc/systemd/system/` folder.
-8. Execute the script `./backup.sh` or create a new Cron job using the command `crontab -e`, following the example below:
+5. Change the `CONFIG=”/path/to/.conf"` field in the `backup.sh` and `restore.sh` files to match the path to your `.conf` file.
+6. Make the scripts executable using the command `sudo chmod +x`.
+7. Replace the values `--config=/path/user/rclone.conf` and `Borg:` in the `Backup.service` file with appropriate settings, where `--config` corresponds to the location of your `rclone.conf` file, and `Borg:/` corresponds to your remote (cloud) to be mounted.
+8. Move the `Backup.service` to the `/etc/systemd/system/` folder.
+9. Execute the script `./backup.sh` or create a new Cron job using the command `crontab -e`, following the example below:
 
 ```
 00 00 * * * sudo ./backup.sh
