@@ -410,8 +410,8 @@ while true; do
       backup
 
       # Preparing scripts
-      wget https://raw.githubusercontent.com/edsonsbj/Backup-Restore-Borg/main/Backup.sh
-      wget https://raw.githubusercontent.com/edsonsbj/Backup-Restore-Borg/main/Restore.sh
+      wget https://raw.githubusercontent.com/edsonsbj/Backup-Restore-Borg-Rclone/main/Backup.sh
+      wget https://raw.githubusercontent.com/edsonsbj/Backup-Restore-Borg-Rclone/main/Restore.sh
       chmod 700 *.sh
       clear
 
@@ -428,8 +428,8 @@ while true; do
       nextcloud
 
       # Preparing scripts
-      wget https://raw.githubusercontent.com/edsonsbj/Backup-Restore-Borg/main/scripts/Nextcloud/Backup.sh
-      wget https://raw.githubusercontent.com/edsonsbj/Backup-Restore/main/scripts/Nextcloud/Restore.sh
+      wget https://raw.githubusercontent.com/edsonsbj/Backup-Restore-Borg-Rclone/main/scripts/Nextcloud/Backup.sh
+      wget https://raw.githubusercontent.com/edsonsbj/Backup-Restore-Borg-Rclone/main/scripts/Nextcloud/Restore.sh
       chmod 700 *.sh
       clear
 
@@ -446,8 +446,8 @@ while true; do
       nextcloud_snap
 
       # Preparing scripts
-      wget https://raw.githubusercontent.com/edsonsbj/Backup-Restore-Borg/main/scripts/Nextcloud%20-%20%20SNAP/Backup.sh
-      wget https://raw.githubusercontent.com/edsonsbj/Backup-Restore-Borg/main/scripts/Nextcloud%20-%20%20SNAP/Restore.sh
+      wget https://raw.githubusercontent.com/edsonsbj/Backup-Restore-Borg-Rclone/main/scripts/Nextcloud%20-%20%20SNAP/Backup.sh
+      wget https://raw.githubusercontent.com/edsonsbj/Backup-Restore-Borg-Rclone/main/scripts/Nextcloud%20-%20%20SNAP/Restore.sh
       chmod 700 *.sh
       clear
 
@@ -464,8 +464,8 @@ while true; do
       mediaserver
 
       # Preparing scripts
-      wget https://raw.githubusercontent.com/edsonsbj/Backup-Restore-Borg/main/scripts/Media%20Server/Backup.sh
-      wget https://raw.githubusercontent.com/edsonsbj/Backup-Restore-Borg/main/scripts/Media%20Server/Restore.sh
+      wget https://raw.githubusercontent.com/edsonsbj/Backup-Restore-Borg-Rclone/main/scripts/Media%20Server/Backup.sh
+      wget https://raw.githubusercontent.com/edsonsbj/Backup-Restore-Borg-Rclone/main/scripts/Media%20Server/Restore.sh
       chmod 700 *.sh
       clear
 
@@ -483,8 +483,8 @@ while true; do
       mediaserver
 
       # Preparing scripts      
-      wget https://raw.githubusercontent.com/edsonsbj/Backup-Restore-Borg/main/scripts/Nextcloud%20%2B%20Media%20server%20/Backup.sh
-      wget https://raw.githubusercontent.com/edsonsbj/Backup-Restore-Borg/main/scripts/Nextcloud%20%2B%20Media%20server%20/Restore.sh
+      wget https://raw.githubusercontent.com/edsonsbj/Backup-Restore-Borg-Rclone/main/scripts/Nextcloud%20%2B%20Media%20server%20/Backup.sh
+      wget https://raw.githubusercontent.com/edsonsbj/Backup-Restore-Borg-Rclone/main/scripts/Nextcloud%20%2B%20Media%20server%20/Restore.sh
       chmod 700 *.sh
       clear
 
@@ -502,8 +502,8 @@ while true; do
       mediaserver
 
       # Preparing scripts
-      wget https://raw.githubusercontent.com/edsonsbj/Backup-Restore-Borg/main/scripts/Nextcloud%20%20SNAP%20%2B%20Media%20server/Backup.sh
-      wget https://raw.githubusercontent.com/edsonsbj/Backup-Restore-Borg/main/scripts/Nextcloud%20%20SNAP%20%2B%20Media%20server/Restore.sh
+      wget https://raw.githubusercontent.com/edsonsbj/Backup-Restore-Borg-Rclone/main/scripts/Nextcloud%20%20SNAP%20%2B%20Media%20server/Backup.sh
+      wget https://raw.githubusercontent.com/edsonsbj/Backup-Restore-Borg-Rclone/main/scripts/Nextcloud%20%20SNAP%20%2B%20Media%20server/Restore.sh
       chmod 700 *.sh
       clear
 
