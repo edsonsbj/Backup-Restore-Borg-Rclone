@@ -14,8 +14,8 @@ With these scripts, all these elements can be included in a backup.
 
 ## Important Notes About Using the Scripts
 
-- **Important**: Before using these scripts, you need to have [rclone] (https://rclone.org/) installed and configured with a backup remote.
-- **Important**: Also, make sure [Borg] (https://borgbackup.readthedocs.io/en/stable/) is installed on your system.
+- **Important**: Before using these scripts, you need to have [rclone](https://rclone.org/) installed and configured with a backup remote.
+- **Important**: Also, make sure [Borg](https://borgbackup.readthedocs.io/en/stable/) is installed on your system.
 - After cloning or downloading the scripts, they need to be set up by running the `setup.sh` script (see below).
 - If you don't want to use the automated setup, you can also use the `BackupRestore.conf.sample` file as a starting point. Just make sure to rename the file when you're done (`cp BackupRestore.conf.sample BackupRestore.conf`).
 - The configuration file `BackupRestore.conf` has to be located in the same directory as the backup/restore scripts.
