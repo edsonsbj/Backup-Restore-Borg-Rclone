@@ -1,0 +1,61 @@
+# This is a sample configuration file for backup and restore scripts.
+# It is recommended to use the script `setup.sh` for an easy automated setup of the backup and restore scripts.
+# This will then create the configuration file `BackupRestore.conf`.
+#
+# If you do not want to use the setup script, you can also take this file as starting point.
+# You will have to edit all section marked with '# TODO' in order to customize the configuration so it fits your Nextcloud instance.
+# Simply copy the sample file (`cp NextcloudBackupRestore.conf.sample NextcloudBackupRestore.conf`) and edit the file accordingly.
+
+# Configuration for Backup-Restore scripts
+
+# TODO: The uuid of the backup drive
+uuid='123456789ABCDEFGH'
+
+# TODO: The Backup Drive Mount Point
+BackupDisk='/mnt/Backup'
+
+# Log File
+LogFile="/var/log/Rsync-$(date +%Y-%m-%d_%H-%M).txt"
+
+# TODO: Borg Repository
+export BORG_REPO='/mnt/Arquivos/Backups/Borg'
+
+# TODO: The Command to capture password
+export BORG_PASSCOMMAND="openssl enc -d -aes-256-cbc -a -md sha512 -pbkdf2 -iter 10000 -salt -in pass.enc -pass file:key"
+
+# TODO: Directory to backup 
+SourceDir='/'
+
+# TODO: The service name of the web server. Used to start/stop web server (e.g. 'systemctl start <webserverServiceName>')
+webserverServiceName='nginx'
+
+# TODO: The directory of your Nextcloud installation (this is a directory under your web root)
+NextcloudConfig='/var/www/nextcloud'
+
+# TODO: The directory of your Nextcloud data directory (outside the Nextcloud file directory)
+# If your data directory is located in the Nextcloud files directory (somewhere in the web root),
+# the data directory must not be a separate part of the backup
+NextcloudDataDir='/var/www/nextcloud/data'
+
+# TODO: The name of the database system (one of: mysql, mariadb, postgresql)
+# 'mysql' and 'mariadb' are equivalent, so when using 'mariadb', you could also set this variable to 'mysql' and vice versa.
+DatabaseSystem='mysql'
+
+# TODO: Your Nextcloud database name
+NextcloudDatabase='nextcloud_db'
+
+# TODO: Your Nextcloud database user
+DBUser='nextcloud_db_user'
+
+# TODO: The password of the Nextcloud database user
+DBPassword='yourpassword'
+
+# TODO: The service name of the media server. Used to start/stop web server (e.g. 'systemctl start <mediaserverServiceName>')
+MediaserverService='plexmediaserver'
+
+# TODO: The service name of the media server. Used to restore permissions media server settings)
+MediaserverUser='plex'
+
+# TODO: The directory where the Media Server settings are stored (this directory is stored within /var/lib)
+MediaserverConf='/var/lib/plexmediaserver/Library/Application Support/Plex Media Server'
+

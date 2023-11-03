@@ -1,0 +1,40 @@
+# /etc/systemd/system/rclone.service
+[Unit]
+Description=Onedrive (rclone) # Opici
+AssertPathIsDirectory=/mnt/rclone/Borg
+After=Multimidia.service
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/rclone mount \
+# Location of the rclone.conf file
+        --config=/path/user/rclone.conf \
+# This is to allow users who are not the user running rclone to access the mount
+        --allow-other \
+# The local disk used for cache
+        --cache-dir=/tmp/rclone/vfs \
+# Do not update the destination mod-time if files are identical
+        --no-modtime \
+# Interval between printing stats, e.g. 500ms, 60s, 5m (0 to disable) (default 1m0s)
+        --stats=0 \
+# This sets a per file bandwidth control and I limit this to a bit higher than my highest bitrate I would like to play back
+        --bwlimit=30M \
+# Time to cache directory entries for
+        --dir-cache-time=120m \
+# This is used to cache files on the local disk for streaming
+        --vfs-cache-mode full \
+# This limits the cache size to the value below
+        --vfs-cache-max-size 20G \
+# Set the user agent to a specific string
+	--user-agent "ISV|rclone.org|rclone/v1.62.2" \
+# Do not create Onedrive Business versions
+        --onedrive-no-versions \
+# Set the tpslimit
+        --tpslimit 4 \
+        --cache-info-age=60m Borg:/ /mnt/rclone/Borg
+ExecStop=/bin/fusermount -u /mnt/rclone/Borg
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=default.target
