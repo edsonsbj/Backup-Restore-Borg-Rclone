@@ -1,6 +1,6 @@
-# Backup-Restore
+# Backup-Restore-Borg-Rclone
 
-This repository contains scripts for performing backup and restoration tasks using Borg. These are Bash scripts for backup/restore of [Nextcloud](https://nextcloud.com/) and media servers like [Emby](https://emby.media/), [Jellyfin](https://jellyfin.org/), and [Plex](https://www.plex.tv/), all of which are installed on the same machine.
+This repository contains scripts for performing backup and restoration tasks using a combination of Rclone Mount and Borg. These are Bash scripts for backup/restore of [Nextcloud](https://nextcloud.com/) and media servers like [Emby](https://emby.media/), [Jellyfin](https://jellyfin.org/), and [Plex](https://www.plex.tv/), all of which are installed on the same machine.
 
 ## General Information
 
@@ -14,6 +14,8 @@ With these scripts, all these elements can be included in a backup.
 
 ## Important Notes About Using the Scripts
 
+- **Important**: Before using these scripts, you need to have [rclone] (https://rclone.org/) installed and configured with a backup remote.
+- **Important**: Also, make sure [Borg] (https://borgbackup.readthedocs.io/en/stable/) is installed on your system.
 - After cloning or downloading the scripts, they need to be set up by running the `setup.sh` script (see below).
 - If you don't want to use the automated setup, you can also use the `BackupRestore.conf.sample` file as a starting point. Just make sure to rename the file when you're done (`cp BackupRestore.conf.sample BackupRestore.conf`).
 - The configuration file `BackupRestore.conf` has to be located in the same directory as the backup/restore scripts.
@@ -23,7 +25,7 @@ With these scripts, all these elements can be included in a backup.
 
 1. Run the following command in a terminal with administrator privileges:
    ```
-   wget https://raw.githubusercontent.com/edsonsbj/Backup-Restore-Borg/main/setup.sh && sudo chmod 700 *.sh && ./sudo setup.sh
+   wget https://raw.githubusercontent.com/edsonsbj/Backup-Restore-Borg-Rclone/main/setup.sh && sudo chmod 700 *.sh && ./sudo setup.sh
    ```
 2. After running the interactive script `setup.sh`, the `Backup.sh` and `Restore.sh` scripts will be generated based on your selection, along with the `BackupRestore.conf` for using the script, and configuring cron.
 3. **Important**: Check that all files were created and must be in /root/Scripts.
@@ -35,10 +37,12 @@ Keep in mind that the configuration file `BackupRestore.conf` has to be located 
 ## Manual Setup
 
 1. Install Git if it is not already installed.
-2. Clone this repository or download and unzip the zip file: `git clone https://github.com/edsonsbj/Backup-Restore-Borg.git`
+2. Clone this repository or download and unzip the zip file: `git clone https://github.com/edsonsbj/Backup-Restore-Borg-Rclone.git`
 3. Choose the script you want to use for backup and restore and delete the others. Remember that the scripts in the root folder are intended to back up all the files on your system, useful if you are not interested in backing up and restoring Nextcloud, Emby, Jellyfin, and Plex servers.
 4. Copy the `BackupRestore.conf.sample` file to `BackupRestore.conf`, which must be in the same folder as the scripts.
 5. Make the scripts executable with: `chmod 700 *.sh`
+6. Replace the values `--config=/path/user/rclone.conf` and `Borg:` in the `Backup.service` file with appropriate settings, where `--config` corresponds to the location of your `rclone.conf` file, and `Borg:/` corresponds to your remote (cloud) to be mounted.
+7. Move the `Backup.service` to the `/etc/systemd/system/` folder.
 
 ## Performing Backup or Restoration
 
@@ -134,5 +138,3 @@ Here, the commands described above remain the same:
    ```
    Restore Nextcloud settings, database, and data folder, as well as Media Server settings.
 ```
-
-This restructured README.md is well-organized, more concise, and easier to understand. Please remember to replace the URLs and paths with your own specific details as needed.
