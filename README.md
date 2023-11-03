@@ -137,4 +137,3 @@ Here, the commands described above remain the same:
    sudo ./Restore.sh 2023-07-15 5
    ```
    Restore Nextcloud settings, database, and data folder, as well as Media Server settings.
-```
