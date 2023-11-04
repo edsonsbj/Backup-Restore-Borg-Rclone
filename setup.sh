@@ -169,7 +169,7 @@ borg() {
 LogFile="$LogFile"
 
 # TODO: Borg Repository
-export BORG_REPO='$BackupDisk/$Borg'
+export BORG_REPO='$BackupDir/$Borg'
 
 # TODO: The Command to capture password
 export BORG_PASSCOMMAND="$PASSCOMMAND"
