@@ -3,6 +3,8 @@
 CONFIG="$(dirname "${BASH_SOURCE[0]}")/BackupRestore.conf"
 . $CONFIG
 
+ARCHIVE_DATE=$1
+
 # Create a log file to record command outputs
 touch "$LogFile"
 exec > >(tee -a "$LogFile")
@@ -11,16 +13,47 @@ exec 2>&1
 # Function for error messages
 errorecho() { cat <<< "$@" 1>&2; } 
 
-## ---------------------------------- TESTS ------------------------------ #
+# Start Rclone Mount    
+systemctl start borgbackup.service
 
+## ---------------------------------- TESTS ------------------------------ #
 # Check if the script is being executed by root or with sudo
 if [[ $EUID -ne 0 ]]; then
    echo "========== This script needs to be executed as root or with sudo. ==========" 
    exit 1
 fi
 
-# -------------------------------FUNCTIONS----------------------------------------- #
+# Change to the root directory. This is critical because borg extract uses relative directory, so we must change to the root of the system to avoid errors or random directories during restoration.
+echo "Changing to the root directory..."
+cd /
+echo "pwd is $(pwd)"
+echo "location of the database backup file is " '/'
+    
+if [ $? -eq 0 ]; then
+    echo "Done"
+else
+    echo "Failed to change to the root directory. Restoration failed."
+    exit 1
+    fi
 
+# Check if the restoration date is specified
+if [ -z "$ARCHIVE_DATE" ]
+then
+    echo "Please specify the restoration date."
+    exit 1
+fi
+
+# Find the backup file name corresponding to the specified date
+ARCHIVE_NAME=$(borg list $BORG_REPO | grep $ARCHIVE_DATE | awk '{print $1}')
+
+# Check if the backup file is found
+if [ -z "$ARCHIVE_NAME" ]
+then
+    echo "Could not find a backup file for the specified date: $ARCHIVE_DATE"
+    exit 1
+fi
+
+# -------------------------------FUNCTIONS----------------------------------------- #
 # Function to Nextcloud Maintenance Mode
 nextcloud_enable() {
     # Enabling Maintenance Mode
@@ -43,52 +76,10 @@ start_webserver() {
 	systemctl start $webserverServiceName
 }
 
-# Obtaining file information and dates to be restored
-check_restore() {
-
-    # Start Rclone Mount    
-    systemctl start borgbackup.service
-
-    # Change to the root directory. This is critical because borg extract uses relative directory, so we must change to the root of the system to avoid errors or random directories during restoration.
-    echo "Changing to the root directory..."
-    cd /
-    echo "pwd is $(pwd)"
-    echo "location of the database backup file is " '/'
-    
-    if [ $? -eq 0 ]; then
-        echo "Done"
-    else
-        echo "Failed to change to the root directory. Restoration failed."
-        exit 1
-    fi
-
-    ARCHIVE_DATE=$1
-
-    # Check if the restoration date is specified
-    if [ -z "$ARCHIVE_DATE" ]
-    then
-        echo "Please specify the restoration date."
-        exit 1
-    fi
-
-    # Find the backup file name corresponding to the specified date
-    ARCHIVE_NAME=$(borg list $BORG_REPO | grep $ARCHIVE_DATE | awk '{print $1}')
-
-    # Check if the backup file is found
-    if [ -z "$ARCHIVE_NAME" ]
-    then
-        echo "Could not find a backup file for the specified date: $ARCHIVE_DATE"
-        exit 1
-    fi
-
-}
-
 # Function to restore Nextcloud settings
 nextcloud_settings() {
     echo "========== Restoring Nextcloud settings $( date )... =========="
     echo ""
-
-    check_restore
 
     nextcloud_enable
 
@@ -120,8 +111,6 @@ nextcloud_data() {
     echo "========== Restoring Nextcloud DATA folder $( date )...=========="
     echo ""
 
-    check_restore
-
     nextcloud_enable
 
     # Extract Files
@@ -138,8 +127,6 @@ nextcloud_data() {
 nextcloud_complete() {
     echo "========== Restoring Nextcloud $( date )... =========="
     echo ""
-
-    check_restore
 
     nextcloud_enable
 
