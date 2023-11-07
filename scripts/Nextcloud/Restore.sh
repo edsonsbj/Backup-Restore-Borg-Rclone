@@ -3,7 +3,7 @@
 CONFIG="$(dirname "${BASH_SOURCE[0]}")/BackupRestore.conf"
 . $CONFIG
 
-ARCHIVE_DATE=$1
+ARCHIVE_DATE=$2
 
 # Create a log file to record command outputs
 touch "$LogFile"
@@ -23,46 +23,54 @@ if [[ $EUID -ne 0 ]]; then
    exit 1
 fi
 
-# Change to the root directory. This is critical because borg extract uses relative directory, so we must change to the root of the system to avoid errors or random directories during restoration.
-echo "Changing to the root directory..."
-cd /
-echo "pwd is $(pwd)"
-echo "location of the database backup file is " '/'
-    
-if [ $? -eq 0 ]; then
-    echo "Done"
+# Change to the root directory, and exit with an error message if it fails
+if cd /; then
+    echo "Changed to the root directory ($(pwd))"
+    echo "Location of the database backup file is /"
 else
     echo "Failed to change to the root directory. Restoration failed."
-    exit 1
-    fi
-
-# Check if the restoration date is specified
-if [ -z "$ARCHIVE_DATE" ]
-then
-    echo "Please specify the restoration date."
-    exit 1
-fi
-
-# Find the backup file name corresponding to the specified date
-ARCHIVE_NAME=$(borg list $BORG_REPO | grep $ARCHIVE_DATE | awk '{print $1}')
-
-# Check if the backup file is found
-if [ -z "$ARCHIVE_NAME" ]
-then
-    echo "Could not find a backup file for the specified date: $ARCHIVE_DATE"
     exit 1
 fi
 
 # -------------------------------FUNCTIONS----------------------------------------- #
+# Obtaining file information and dates to be restored
+check_restore() {
+    # Check if the restoration date is specified
+    if [ -z "$ARCHIVE_DATE" ]
+    then
+        read -p "Enter the restoration date (YYYY-MM-DD): " ARCHIVE_DATE
+    if [ -z "$ARCHIVE_DATE" ]
+    then
+        echo "No date provided. Going off script."
+        exit 1
+    fi
+ fi
+
+    # Find the backup file name corresponding to the specified date
+    ARCHIVE_NAME=$(borg list $BORG_REPO | grep $ARCHIVE_DATE | awk '{print $1}')
+
+    # Check if the backup file is found
+    if [ -z "$ARCHIVE_NAME" ]
+    then
+        echo "Could not find a backup file for the specified date: $ARCHIVE_DATE"
+        exit 1
+    fi
+
+}
+
 # Function to Nextcloud Maintenance Mode
 nextcloud_enable() {
     # Enabling Maintenance Mode
+    echo "============ Enabling Maintenance Mode... ============"
 	sudo -u www-data php $NextcloudConfig/occ maintenance:mode --on
+    echo ""
 }
 
 nextcloud_disable() {
     # Disabling Nextcloud Maintenance Mode
+    echo "============ Disabling Maintenance Mode... ============"
 	sudo -u www-data php $NextcloudConfig/occ maintenance:mode --off
+    echo ""
 }
 
 # Function to WebServer Stop Start
@@ -78,40 +86,49 @@ start_webserver() {
 
 # Function to restore Nextcloud settings
 nextcloud_settings() {
-    echo "========== Restoring Nextcloud settings $( date )... =========="
-    echo ""
+
+    check_restore
 
     nextcloud_enable
 
     stop_webserver
 
     # Removing old versions 
-    mv $NextcloudConfig '$NextcloudConfig.old/'
+    mv $NextcloudConfig "$NextcloudConfig.old/"
+    
+    echo "========== Restoring Nextcloud settings $( date )... =========="
+    echo ""
 
     # Extract Files
     borg extract -v --list $BORG_REPO::$ARCHIVE_NAME $NextcloudConfig
 
     # Restore the database
-    mysql -u --host=localhost --user=$DBUser --password=$DBPassword $NextcloudDatabase < "$NextcloudConfig/nextclouddb.sql" >> $RESTLOGFILE_PATH
+    mysql --host=localhost --user=$DBUser --password=$DBPassword -e "DROP DATABASE $NextcloudDatabase"
+    mysql --host=localhost --user=$DBUser --password=$DBPassword -e "CREATE DATABASE $NextcloudDatabase CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci"    
+    mysql --host=localhost --user=$DBUser --password=$DBPassword $NextcloudDatabase < "$NextcloudConfig/nextclouddb.sql"
 
     # Restore permissions
     chmod -R 755 $NextcloudConfig
     chown -R www-data:www-data $NextcloudConfig
 
-    # Removing unnecessary files
-    rm "$NextcloudConfig/nextclouddb.sql"
+    start_webserver    
 
     nextcloud_disable
 
-    start_webserver    
+    # Removing unnecessary files
+    rm "$NextcloudConfig/nextclouddb.sql"
+    rm -rf "$NextcloudConfig.old/"
 }
 
 # Function to restore Nextcloud DATA folder
 nextcloud_data() {
-    echo "========== Restoring Nextcloud DATA folder $( date )...=========="
-    echo ""
+
+    check_restore
 
     nextcloud_enable
+
+    echo "========== Restoring Nextcloud DATA folder $( date )...=========="
+    echo ""
 
     # Extract Files
     borg extract -v --list $BORG_REPO::$ARCHIVE_NAME $NextcloudDataDir
@@ -125,8 +142,8 @@ nextcloud_data() {
 
 # Function to restore Nextcloud
 nextcloud_complete() {
-    echo "========== Restoring Nextcloud $( date )... =========="
-    echo ""
+
+    check_restore
 
     nextcloud_enable
 
@@ -135,11 +152,16 @@ nextcloud_complete() {
     # Removing old versions 
     mv $NextcloudConfig '$NextcloudConfig.old/'
 
+    echo "========== Restoring Nextcloud $( date )... =========="
+    echo ""
+
     # Extract Files
     borg extract -v --list $BORG_REPO::$ARCHIVE_NAME $NextcloudConfig $NextcloudDataDir
 
     # Restore the database
-    mysql -u --host=localhost --user=$DBUser --password=$DBPassword $NextcloudDatabase < "$NextcloudConfig/nextclouddb.sql" >> $RESTLOGFILE_PATH
+    mysql --host=localhost --user=$DBUser --password=$DBPassword -e "DROP DATABASE $NextcloudDatabase"
+    mysql --host=localhost --user=$DBUser --password=$DBPassword -e "CREATE DATABASE $NextcloudDatabase CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci"    
+    mysql --host=localhost --user=$DBUser --password=$DBPassword $NextcloudDatabase < "$NextcloudConfig/nextclouddb.sql"
 
     # Restore permissions
     chmod -R 755 $NextcloudConfig
@@ -147,12 +169,13 @@ nextcloud_complete() {
     chmod -R 770 $NextcloudDataDir 
     chown -R www-data:www-data $NextcloudDataDir
 
-    # Removing unnecessary files
-    rm "$NextcloudConfig/nextclouddb.sql"
-    
+    start_webserver
+
     nextcloud_disable
 
-    start_webserver
+    # Removing unnecessary files
+    rm "$NextcloudConfig/nextclouddb.sql"
+    rm -rf "$NextcloudConfig.old/"
 }
 
 # Check if an option was passed as an argument
@@ -160,13 +183,13 @@ if [[ ! -z $1 ]]; then
     # Execute the corresponding Restore option
     case $1 in
         1)
-            nextcloud_settings
+            nextcloud_settings $2
             ;;
         2)
-            nextcloud_data
+            nextcloud_data $2
             ;;
         3)
-            nextcloud_complete
+            nextcloud_complete $2
             ;;
         *)
             echo "Invalid option!"
@@ -193,9 +216,6 @@ else
             ;;
         3)
             nextcloud_complete
-            ;;
-        *)
-            echo "Invalid option!"
             ;;
         4)
             echo "Leaving the script."
