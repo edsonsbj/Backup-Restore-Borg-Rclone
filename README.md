@@ -113,15 +113,15 @@ If you chose between options 2 or 4 >> Nextcloud and Nextcloud + Media Server in
 ### Nextcloud
 
    ```
-   sudo ./Restore.sh 2023-07-15 1
+   sudo ./Restore.sh 1 2023-07-15 
    ```
    Restore Nextcloud configurations, database, and data folder.
    ```
-   sudo ./Restore 2023-07-15 2
+   sudo ./Restore.sh 2 2023-07-15
    ```
    Restore Nextcloud configurations and database.
    ```
-   sudo ./Restore.sh 2023-07-15 3
+   sudo ./Restore.sh 3 2023-07-15
    ```
    Restore Nextcloud configurations and database.
 
@@ -130,10 +130,10 @@ If you chose between options 2 or 4 >> Nextcloud and Nextcloud + Media Server in
 Here, the commands described above remain the same:
 
    ```
-   sudo ./Restore.sh 2023-07-15 4
+   sudo ./Restore.sh 4 2023-07-15
    ```
    Restore Nextcloud and Media Server settings.
    ```
-   sudo ./Restore.sh 2023-07-15 5
+   sudo ./Restore.sh 5 2023-07-15
    ```
    Restore Nextcloud settings, database, and data folder, as well as Media Server settings.
