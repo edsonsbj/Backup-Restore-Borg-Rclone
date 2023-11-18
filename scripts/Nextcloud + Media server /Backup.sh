@@ -1,7 +1,5 @@
 #!/bin/bash
 
-#!/bin/bash
-
 # Make sure the script exits when any command fails
 set -Eeuo pipefail
 
