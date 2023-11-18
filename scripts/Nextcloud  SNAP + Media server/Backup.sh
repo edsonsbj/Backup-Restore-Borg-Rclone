@@ -1,7 +1,22 @@
 #!/bin/bash
 
-CONFIG="$(dirname "${BASH_SOURCE[0]}")/BackupRestore.conf"
-. $CONFIG
+#!/bin/bash
+
+# Make sure the script exits when any command fails
+set -Eeuo pipefail
+
+SCRIPT_DIR=$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)
+CONFIG="$SCRIPT_DIR/BackupRestore.conf"
+
+# Check if config file exists
+if [ ! -f "$CONFIG" ]; then
+    echo "ERROR: Configuration file $CONFIG cannot be found!"
+    echo "Please make sure that a configuration file '$CONFIG' is present in the main directory of the scripts."
+    echo "This file can be created automatically using the setup.sh script."
+    exit 1
+fi
+
+source "$CONFIG"
 
 # Create a log file to record command outputs
 touch "$LogFile"
@@ -14,7 +29,7 @@ trap 'echo $( date ) Backup interrupted >&2; exit 2' INT TERM
 
 ## ---------------------------------- TESTS ------------------------------ #
 # Check if the script is being executed by root or with sudo
-if [[ $EUID -ne 0 ]]; then
+if [ $EUID -ne 0 ]; then
    echo "========== This script needs to be executed as root or with sudo. ==========" 
    exit 1
 fi
@@ -212,8 +227,7 @@ EOF
 }
 
 # Check if an option was passed as an argument
-if [[ ! -z $1 ]]; then
-    # Execute the corresponding Backup option
+if [[ ! -z ${1:-""} ]]; then    # Execute the corresponding Backup option
     case $1 in
         1)
             nextcloud_settings

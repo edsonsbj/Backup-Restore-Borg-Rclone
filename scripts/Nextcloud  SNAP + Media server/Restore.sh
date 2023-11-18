@@ -1,9 +1,24 @@
 #!/bin/bash
 
-CONFIG="$(dirname "${BASH_SOURCE[0]}")/BackupRestore.conf"
-. $CONFIG
+#!/bin/bash
 
-ARCHIVE_DATE=$2
+# Make sure the script exits when any command fails
+set -Eeuo pipefail
+
+SCRIPT_DIR=$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)
+CONFIG="$SCRIPT_DIR/BackupRestore.conf"
+
+# Check if config file exists
+if [ ! -f "$CONFIG" ]; then
+    echo "ERROR: Configuration file $CONFIG cannot be found!"
+    echo "Please make sure that a configuration file '$CONFIG' is present in the main directory of the scripts."
+    echo "This file can be created automatically using the setup.sh script."
+    exit 1
+fi
+
+source "$CONFIG"
+
+ARCHIVE_DATE=${2:-""}
 
 # Create a log file to record command outputs
 touch "$LogFile"
@@ -18,7 +33,7 @@ systemctl start borgbackup.service
 
 ## ---------------------------------- TESTS ------------------------------ #
 # Check if the script is being executed by root or with sudo
-if [[ $EUID -ne 0 ]]; then
+if [ $EUID -ne 0 ]; then
    echo "========== This script needs to be executed as root or with sudo. ==========" 
    exit 1
 fi
@@ -116,43 +131,8 @@ nextcloud_data() {
     echo ""
 }
 
-# Function to restore Nextcloud
-nextcloud_complete() {
-
-    check_restore
-
-    # Enabling Maintenance Mode
-    echo "============ Enabling Maintenance Mode... ============"
-	sudo nextcloud.occ maintenance:mode --on
-    echo ""
-
-    # Enable Midias Removevel
-    sudo snap connect nextcloud:removable-media
-
-    echo "========== Restoring Nextcloud $( date )... =========="
-    echo ""
-
-    # Extract Files
-    borg extract -v --list $BORG_REPO::$ARCHIVE_NAME $NextcloudSnapConfig $NextcloudDataDir
-
-    # Import the settings and database
-    sudo nextcloud.import -abc $NextcloudSnapConfig
-
-    # Removing unnecessary files
-    rm -rf $NextcloudSnapConfig 
-
-    # Restore permissions
-    chmod -R 770 $NextcloudDataDir 
-    chown -R root:root $NextcloudDataDir
-
-    # Disabling Maintenance Mode
-    echo "============ Disabling Maintenance Mode... ============"
-	sudo nextcloud.occ maintenance:mode --off
-    echo ""
-}
-
 # Function to restore Nextcloud and Media Server settings
-nextcloud_mediaserver_settings() {
+mediaserver_settings() {
 
     check_restore
 
@@ -165,13 +145,7 @@ nextcloud_mediaserver_settings() {
     echo ""
 
     # Extract Files
-    borg extract -v --list $BORG_REPO::$ARCHIVE_NAME $NextcloudSnapConfig "$MediaserverConf"
-
-    # Enable removable media
-    sudo snap connect nextcloud:removable-media
-
-    # Import the settings and database
-    sudo nextcloud.import -abc $NextcloudSnapConfig
+    borg extract -v --list $BORG_REPO::$ARCHIVE_NAME "$MediaserverConf"
 
     # Restore permissions
     chmod -R 755 $MediaserverConf
@@ -182,59 +156,11 @@ nextcloud_mediaserver_settings() {
 
     start_mediaserver
 
-    # Removing unnecessary files
-    rm -rf $NextcloudSnapConfig 
-}
-
-# Function to restore Nextcloud Complete and Media Server settings
-nextcloud_mediaserver_complete() {
-
-    check_restore
-
-    stop_mediaserver
-
-    # Remove the current folder
-    mv "$MediaserverConf" "$MediaserverConf.old/"
-
-    # Enabling Maintenance Mode
-    echo "============ Enabling Maintenance Mode... ============"
-	sudo nextcloud.occ maintenance:mode --on
-    echo ""
-
-    echo "========== Restoring all Nextcloud and Media Server settings  $( date )... =========="
-    echo ""
-
-    # Extract Files
-    borg extract -v --list $BORG_REPO::$ARCHIVE_NAME "$NextcloudSnapConfig" "$NextcloudDataDir" "$MediaserverConf"
-
-    # Enable Midias Removevel
-    sudo snap connect nextcloud:removable-media
-
-    # Import the settings and database
-    sudo nextcloud.import -abc $NextcloudSnapConfig
-
-    # Restore permissions
-    chmod -R 755 $MediaserverConf
-    chown -R $MediaserverUser:$MediaserverUser "$MediaserverConf"
-    chmod -R 770 $NextcloudDataDir 
-    chown -R root:root $NextcloudDataDir
-
-    # Disabling Maintenance Mode
-    echo "============ Disabling Maintenance Mode... ============"
-	sudo nextcloud.occ maintenance:mode --off
-    echo ""
-
-    # Add the Media Server User to the www-data group to access Nextcloud folders
-    sudo adduser $MediaserverUser root
-
-    start_mediaserver
-
-    # Removing unnecessary files
-    rm -rf $NextcloudSnapConfig 
+    rm -rf "$MediaserverConf.old/"
 }
 
 # Check if an option was passed as an argument
-if [[ ! -z $1 ]]; then
+if [[ ! -z ${1:-""} ]]; then
     # Execute the corresponding Restore option
     case $1 in
         1)
@@ -244,14 +170,18 @@ if [[ ! -z $1 ]]; then
             nextcloud_data $2
             ;;
         3)
-            nextcloud_complete $2
-            ;;
+            nextcloud_settings $2
+            nextcloud_data $2
+            ;;  
         4)
-            nextcloud_mediaserver_settings $2
+            nextcloud_settings $2
+            mediaserver_settings $2
             ;;
         5)
-            nextcloud_mediaserver_complete $2
-            ;;               
+            nextcloud_settings $2
+            nextcloud_data $2
+            mediaserver_settings $2
+            ;;            
         *)
             echo "Invalid option!"
             ;;
@@ -278,14 +208,18 @@ else
             nextcloud_data
             ;;
         3)
-            nextcloud_complete
-            ;;
+            nextcloud_settings
+            nextcloud_data
+            ;;  
         4)
-            nextcloud_mediaserver_settings
+            nextcloud_settings
+            mediaserver_settings
             ;;
         5)
-            nextcloud_mediaserver_complete
-            ;;             
+            nextcloud_settings
+            nextcloud_data
+            mediaserver_settings
+            ;;            
         6)
             echo "Leaving the script."
             exit 0

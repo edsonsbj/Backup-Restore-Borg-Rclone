@@ -30,7 +30,7 @@ MediaserverUser=''
 errorecho() { cat <<< "$@" 1>&2; }
 
 # Check if the script is being executed by root or with sudo
-if [[ $EUID -ne 0 ]]; then
+if [ $EUID -ne 0 ]; then
    echo "========== This script needs to be executed as root or with sudo. ==========" 
    exit 1
 fi
