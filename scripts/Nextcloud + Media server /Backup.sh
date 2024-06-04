@@ -1,8 +1,9 @@
 #!/bin/bash
 
-# Make sure the script exits when any command fails
+# Exit when any command fails and enable debugging
 set -Eeuo pipefail
 
+# Get the directory where the script is located
 SCRIPT_DIR=$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)
 CONFIG="$SCRIPT_DIR/BackupRestore.conf"
 
@@ -38,178 +39,28 @@ BORG_OPTS="--verbose --filter AME --list --progress --stats --show-rc --compress
 # Start Rclone Mount    
 systemctl start borgbackup.service
 
-#
- Function to Nextcloud Maintenance Mode
-nextcloud_enable() {
-    # Enabling Maintenance Mode
-	sudo -u www-data php $NextcloudConfig/occ maintenance:mode --on
+# Maintenance mode functions
+toggle_nextcloud_mode() {
+    sudo -u www-data php "$NextcloudConfig/occ" maintenance:mode --"$1"
 }
 
-nextcloud_disable() {
-    # Disabling Nextcloud Maintenance Mode
-	sudo -u www-data php $NextcloudConfig/occ maintenance:mode --off
+# Webserver control functions
+toggle_webserver() {
+    systemctl "$1" "$webserverServiceName"
 }
 
-# Function to WebServer Stop Start
-stop_webserver() {
-    # Stop Web Server
-	systemctl stop $webserverServiceName
+# Mediaserver control functions
+toggle_mediaserver() {
+    systemctl "$1" "$MediaserverService"
 }
 
-start_webserver() {
-    # Stop Media Server
-    systemctl stop "$MediaserverService"
-}
-
-# Function to WebServer Stop Start
-stop_mediaserver() {
-    # Stop Media Server
-    systemctl stop "$MediaserverService"
-}
-
-start_mediaserver() {
-    # Start Media Server
-	systemctl start $webserverServiceName
-}
-
-# Function to backup Nextcloud settings
-nextcloud_settings() {
-    echo "========== Backing up Nextcloud settings $( date )... =========="
-    echo ""
-
-    nextcloud_enable
-
-    stop_webserver
-
-   	# Export the database.
-	mysqldump --quick -n --host=localhost $NextcloudDatabase --user=$DBUser --password=$DBPassword > "$NextcloudConfig/nextclouddb.sql"
-
-    # Backup
-    borg create $BORG_OPTS ::'NextcloudConfigs-{now:%Y%m%d-%H%M}' $NextcloudConfig --exclude $NextcloudDataDir
-
-    backup_exit=$?
-
-    # Remove the database
-    rm "$NextcloudConfig/nextclouddb.sql"
-
-    start_webserver
-    
-    nextcloud_disable
-}
-
-# Function to backup Nextcloud DATA folder
-nextcloud_data() {
-    echo "========== Backing up Nextcloud DATA folder $( date )...=========="
-    echo ""
-
-    nextcloud_enable
-
-    borg create $BORG_OPTS ::'NextcloudData-{now:%Y%m%d-%H%M}' $NextcloudDataDir --exclude "$NextcloudDataDir/*/files_trashbin"
-
-    backup_exit=$?
-
-    nextcloud_disable
-}
-
-# Function to perform a complete Nextcloud backup
-nextcloud_complete() {
-    echo "========== Backing up Nextcloud $( date )... =========="
-    echo ""
-    
-    nextcloud_enable
-
-    stop_webserver
-
-   	# Export the database.
-	mysqldump --quick -n --host=localhost $NextcloudDatabase --user=$DBUser --password=$DBPassword > "$NextcloudConfig/nextclouddb.sql"
-
-    # Backup
-    borg create $BORG_OPTS ::'NextcloudFull-{now:%Y%m%d-%H%M}' $NextcloudConfig $NextcloudDataDir --exclude "$NextcloudDataDir/*/files_trashbin"
-
-    backup_exit=$?
-
-    # Remove the database
-    rm "$NextcloudConfig/nextclouddb.sql"
-
-    start_webserver
-
-    nextcloud_disable
-}
-
-# Function to backup Nextcloud and Media Server settings
-nextcloud_mediaserver_settings() {
+# Mediaserver control functions
+borg_patterns_file() {
     # Filters for Inclusion Exclusion Borg
     BorgFilters="./patterns.lst"
 
     # Create a file with the delete standards Borg Inclusion
-    tee -a "$BorgFilters" <<EOF
-P sh
-R /
-
-# DO NOT LOOK IN THESE FOLDERS
-! proc
-
-# DIRECTORIES TO BE EXCLUDED FROM BACKUP  
-
-# Media Server
-- $MediaserverConf/Cache
-- $MediaserverConf/cache
-- $MediaserverConf/Crash Reports
-- $MediaserverConf/Diagnostics
-- $MediaserverConf/Logs
-- $MediaserverConf/logs
-- $MediaserverConf/transcoding-temp
-
-# NEXTCLOUD
-- $NextcloudDataDir
-
-# DIRECTORIES FOR BACKUP 
-
-# Media Server Include
-+ $MediaserverConf/
-
-# NEXTCLOUD - SETTINGS
-+ $NextcloudConfig/
-
-# DO NOT INCLUDE ANY MORE FILES
-- **
-EOF
-
-    echo "========== Backing up Nextcloud and Media Server settings $( date )... =========="
-    echo ""
-
-    nextcloud_enable
-
-    stop_webserver
-
-    stop_mediaserver
-
-   	# Export the database.
-	mysqldump --quick -n --host=localhost $NextcloudDatabase --user=$DBUser --password=$DBPassword > "$NextcloudConfig/nextclouddb.sql"
-
-    # Backup
-    borg create $BORG_OPTS --patterns-from "$BorgFilters" ::'SettingsServer-{now:%Y%m%d-%H%M}'
-
-    backup_exit=$?
-
-    # Remove unnecessary files
-    rm "$NextcloudConfig/nextclouddb.sql"
-    rm "$BorgFilters"
-
-    nextcloud_disable
-
-    start_webserver
-
-    start_mediaserver
-}
-
-# Function to backup Nextcloud and Media Server settings
-nextcloud_mediaserver_complete() {
-    # Filters for Inclusion Exclusion Borg
-    BorgFilters="./patterns.lst"
-
-    # Create a file with the delete standards Borg Inclusion
-    tee -a "$BorgFilters" <<EOF
+    tee -a "$BorgFilters" <<EOF > /dev/null 2>&1
 P sh
 R /
 
@@ -242,15 +93,119 @@ R /
 # DO NOT INCLUDE ANY MORE FILES
 - **
 EOF
+}
 
-    echo "========== Backing up Nextcloud and Media Server settings $( date )... =========="
-    echo ""
+# Function to Prune Repository
+prune() {
+    info "Pruning repository"
 
-    nextcloud_enable
+    # Use the subcoming `prune` to keep 7 days, 4 per week and 6 per month
+    # files of this machine.The prefix '{hostname}-' is very important for
+    # limits PLA's operation to files in this machine and does not apply to
+    # Files of other machines too:
 
-    stop_webserver
+    borg prune --list --progress --show-rc --keep-daily 7 --keep-weekly 4 --keep-monthly 6
+}
 
-    stop_mediaserver
+# Function to backup Nextcloud settings
+nextcloud_settings() {
+    info "Backing up Nextcloud settings $(date)..."
+
+    # Place the server in maintenance mode and stop the web server
+    toggle_nextcloud_mode on
+    toggle_webserver stop
+
+   	# Export the database.
+	mysqldump --quick -n --host=localhost $NextcloudDatabase --user=$DBUser --password=$DBPassword > "$NextcloudConfig/nextclouddb.sql"
+
+    # Backup
+    borg create $BORG_OPTS ::'NextcloudConfigs-{now:%Y%m%d-%H%M}' $NextcloudConfig --exclude $NextcloudDataDir
+
+    backup_exit=$?
+
+    # Remove the database
+    rm "$NextcloudConfig/nextclouddb.sql"
+
+    # Starts the web server and disables maintenance mode
+    toggle_webserver start
+    toggle_nextcloud_mode off
+}
+
+# Function to backup Nextcloud DATA folder
+nextcloud_data() {
+    info "Backing up Nextcloud DATA folder $(date)..."
+
+    # Enables the maintenance mode
+    toggle_nextcloud_mode on
+
+    # Backup
+    borg create $BORG_OPTS ::'NextcloudData-{now:%Y%m%d-%H%M}' $NextcloudDataDir --exclude "$NextcloudDataDir/*/files_trashbin"
+
+    # Disables the maintenance mode
+    toggle_nextcloud_mode off
+}
+
+# Function to perform a complete Nextcloud backup
+nextcloud_complete() {
+    info "Backing up Nextcloud $(date)..."
+    
+    # Place the server in maintenance mode and stop the web server
+    toggle_nextcloud_mode on
+    toggle_webserver stop
+
+   	# Export the database.
+	mysqldump --quick -n --host=localhost $NextcloudDatabase --user=$DBUser --password=$DBPassword > "$NextcloudConfig/nextclouddb.sql"
+
+    # Backup
+    borg create $BORG_OPTS ::'NextcloudFull-{now:%Y%m%d-%H%M}' $NextcloudConfig $NextcloudDataDir --exclude "$NextcloudDataDir/*/files_trashbin"
+
+    # Remove the database
+    rm "$NextcloudConfig/nextclouddb.sql"
+
+    # Starts the web server and disables maintenance mode
+    toggle_webserver start
+    toggle_nextcloud_mode of
+}
+
+# Function to backup Nextcloud and Media Server settings
+nextcloud_mediaserver_settings() {
+    info "Backing up Nextcloud and Media Server settings $(date)..."
+
+    # Create the Patterns file
+    borg_patterns_file
+
+    # Place the server in maintenance mode and stop the web server and media server
+    toggle_nextcloud_mode on
+    toggle_webserver stop
+    toggle_mediaserver stop
+    
+   	# Export the database.
+	mysqldump --quick -n --host=localhost $NextcloudDatabase --user=$DBUser --password=$DBPassword > "$NextcloudConfig/nextclouddb.sql"
+
+    # Backup
+    borg create $BORG_OPTS --patterns-from "$BorgFilters" ::'SettingsServer-{now:%Y%m%d-%H%M}'
+
+    # Remove unnecessary files
+    rm "$NextcloudConfig/nextclouddb.sql"
+    rm "$BorgFilters"
+
+    # Starts the web server and disables maintenance mode
+    toggle_webserver start
+    toggle_nextcloud_mode off
+    toggle_mediaserver start
+}
+
+# Function to backup Nextcloud and Media Server settings
+nextcloud_mediaserver_complete() {
+    info "Backing up Nextcloud and Media Server settings $(date)..."
+
+    # Create the Patterns file
+    borg_patterns_file
+
+    # Place the server in maintenance mode and stop the web server and media server
+    toggle_nextcloud_mode on
+    toggle_webserver stop
+    toggle_mediaserver stop
 
    	# Export the database.
 	mysqldump --quick -n --host=localhost $NextcloudDatabase --user=$DBUser --password=$DBPassword > "$NextcloudConfig/nextclouddb.sql"
@@ -258,41 +213,33 @@ EOF
     # Backup
     borg create $BORG_OPTS --patterns-from "$BorgFilters" ::'SettingsServer-{now:%Y%m%d-%H%M}'
 
-    backup_exit=$?
-
     # Remove unnecessary files
     rm "$NextcloudConfig/nextclouddb.sql"
     rm "$BorgFilters"
 
-    nextcloud_disable
+    # Starts the web server and disables maintenance mode
+    toggle_webserver start
+    toggle_nextcloud_mode off
+    toggle_mediaserver start
+}
 
-    start_webserver
-
-    start_mediaserver
+# Execute the corresponding backup option
+run_backup() {
+    local option="$1"
+    case $option in
+        1) nextcloud_settings ;;
+        2) nextcloud_data ;;
+        3) nextcloud_complete ;;
+        4) nextcloud_mediaserver_settings ;;
+        5) nextcloud_mediaserver_complete ;;
+        *) echo "Invalid option!" && return 1 ;;
+    esac
+    prune
 }
 
 # Check if an option was passed as an argument
-if [[ ! -z ${1:-""} ]]; then    # Execute the corresponding Backup option
-    case $1 in
-        1)
-            nextcloud_settings
-            ;;
-        2)
-            nextcloud_data
-            ;;
-        3)
-            nextcloud_complete
-            ;;
-        4)
-            nextcloud_mediaserver_settings
-            ;;
-        5)
-            nextcloud_mediaserver_complete
-            ;;               
-        *)
-            echo "Invalid option!"
-            ;;
-    esac
+if [[ -n ${1:-} ]]; then
+    run_backup "$1"
 else
     # Display the menu to choose the Backup option
     echo "Choose a Backup option:"
@@ -304,60 +251,12 @@ else
     echo "6. To go out."
 
     # Read the option entered by the user
-    read option
-
-    # Execute the corresponding Backup option
-    case $option in
-        1)
-            nextcloud_settings
-            ;;
-        2)
-            nextcloud_data
-            ;;
-        3)
-            nextcloud_complete
-            ;;
-        4)
-            nextcloud_mediaserver_settings
-            ;;
-        5)
-            nextcloud_mediaserver_complete
-            ;;             
-        6)
-            echo "Leaving the script."
-            exit 0
-            ;;            
-        *)
-            echo "Invalid option!"
-            ;;
-    esac
+    read -r option
+    run_backup "$option"
 fi
 
-    info "Pruning repository"
-
-    # Use the subcoming `prune` to keep 7 days, 4 per week and 6 per month
-    # files of this machine.The prefix '{hostname}-' is very important for
-    # limits PLA's operation to files in this machine and does not apply to
-    # Files of other machines too:
-
-    borg prune --list --progress --show-rc --keep-daily 7 --keep-weekly 4 --keep-monthly 6
-
-    prune_exit=$? 
-
     # Sleep for 3 hours before unmounting the drive
-    sleep 10800
+    sleep 5400
 
     # Stop Rclone Mount    
     systemctl stop borgbackup.service
-
-
-# use highest exit code as global exit code
-global_exit=$(( backup_exit > prune_exit ? backup_exit : prune_exit ))
-
-if [ ${global_exit} -eq 0 ]; then
-    info "Backup, Prune finished successfully" 2>&1 | tee -a
-elif [ ${global_exit} -eq 1 ]; then
-    info "Backup, Prune finished with warnings" 2>&1 | tee -a
-else
-    info "Backup, Prune finished with errors" 2>&1 | tee -a
-fi
